@@ -1,0 +1,344 @@
+
+Let $\lambda$ be the security parameter. All other parameters are functions of $\lambda$. Let $q\geq 2$ be a prime integer. 
+Let $\ell,n,m,w\geq 1$ be polynomially bounded functions of $\lambda$ and $B_L, B_V, B_P$ be positive integers such that the following conditions hold:
+\begin{equation}\label{eq:assumptions}
+    \begin{minipage}{0.9\textwidth}
+\begin{enumerate}
+\item  $n = \Omega(\ell \log q)$ and $m = \Omega(n\log q)$,
+\item $w=n\lceil \log q\rceil$,
+\item $B_P = \frac{q}{2C_T\sqrt{mn\log q}}$, for $C_T$ the universal constant in Theorem~\ref{thm:trapdoor},
+\item $ 2\sqrt{n} \leq B_L < B_V < B_P$,
+\item The ratio $\frac{B_P}{B_V}$ and $\frac{B_V}{B_L}$ are both super-polynomial  in $\lambda$.
+\end{enumerate}
+    \end{minipage}
+  \end{equation}
+Given a choice of parameters satisfying all conditions above, we describe the function family $\mathcal{F}_{\lwe}$. Let $\sX = \mZ_q^n$ and $\sY = \mZ_q^m$. 
+The key space is $\mathcal{K}_{\mathcal{F}_{\lwe}} = \mZ_q^{m\times n} \times \mZ_q^m$. For $b\in \{0,1\}$, $x\in \sX$ and key $k = (\*A,\*A\*s + \*e)$,  the density $f_{k,b}(x) $ is defined as
+\begin{equation}\label{eq:defprobdensity}
+  \forall y \in \sY,\quad   (f_{k,b}(x))(y) = D_{\mZ_q^m,B_P}(y - \*Ax - b\cdot \*A\*s)\;,
+\end{equation}
+where the definition of $D_{\mZ_q^m,B_P}$ is given in~\eqref{eq:d-bounded-def}. Note that $f_{k,b}$ is well-defined given $k$, as for our choice of parameters $k$ uniquely specifies $s$. 
+
+ The four properties required for a trapdoor claw free family, as specified in Definition~\ref{def:trapdoorclawfree}, are verified in the following subsections, providing a proof of the following theorem.
+
+\begin{theorem}\label{thm:lwetcf}
+For any choice of parameters satisfying the conditions~\eqref{eq:assumptions}, the function family $\mathcal{F}_{\lwe}$ is a trapdoor claw free family under the hardness assumption $\lwe_{\ell,q,D_{\mZ_q,B_L}}$. 
+\end{theorem}
+
+\subsection{Efficient Function Generation}
+
+GEN$_{\mathcal{F}_{\lwe}}$ is defined as follows. First, the procedure samples a random $\*A\in \mZ_q^{m\times n}$, together with trapdoor information $t_{\*A}$. This is done using the procedure $\GenTrap(1^n,1^m,q)$ from Theorem~\ref{thm:trapdoor}. The trapdoor allows the evaluation of an inversion algorithm $\Invert$  that, on input $\*A$, $t_{\*A}$ and $b=\*A\*s + \*e$ returns $\*s$ and $\*e$ as long as $\|\*e\|\leq \frac{q}{C_T\sqrt{n\log q}}$. Moreover, the distribution on matrices $\*A$ returned by $\GenTrap$ is negligibly close to the uniform distribution on $\mZ_q^{m\times n}$.
+
+Next, the sampling procedure selects $s\in \{0,1\}^n$ uniformly at random, and a vector $\*e\in \mZ_q^m$ by sampling each coordinate independently according to the distribution $D_{\mZ_q,B_V}$ defined in~\eqref{eq:d-bounded-def}. GEN$_{\mathcal{F}_{\lwe}}$ returns $k = (\*A,\*A\*s + \*e)$ and $t_k = t_{\*A}$. 
+
+
+\subsection{Trapdoor 2-to-1 Function}\label{sec:trapdoortwotoonereq}
+
+\begin{enumerate}
+\item[(a)] \textit{Trapdoor.} It follows from~\eqref{eq:defprobdensity} and the definition of the distribution $D_{\mZ_q^m,B_P}$ in~\eqref{eq:d-bounded-def} that for any key $k=(\*A,\*A\*s+\*e)\in \mathcal{K}_{\mathcal{F}_{\lwe}}$ and for all $x\in \sX$,
+\begin{eqnarray}
+\supp(f_{k,0}(x)) &=& \big\{y \in \sY \,|\; y = \*Ax + \*e_0, \; \|\*e_0\|\leq B_P\sqrt{m}\big\}\;,\label{eq:supportofpdf0}\\
+\supp(f_{k,1}(x)) &=& \big\{y \in \sY\,|\; y = \*Ax + \*A\*s + \*e_0, \;\|\*e_0\|\leq B_P\sqrt{m}\big\}\;.\label{eq:supportofpdf1}
+\end{eqnarray}
+The procedure $\textrm{INV}_{\mathcal{F}_{\lwe}}$ takes as input the trapdoor $t_{\*A}$, $b\in\{0,1\}$, and $y\in \sY$. It uses the algorithm $\Invert$ to determine $\*s_0,\*e_0$ such that $y = \*A\*s_0+\*e_0$, and returns the element $\*s_0 - b \cdot\*s\in\sX$. Using Theorem~\ref{thm:trapdoor}, this procedure returns the unique correct outcome provided $y = \*A\*s_0+\*e_0$ for some $\*e_0$ such that $  \|\*e_0\|  \,\leq\, \frac{q}{C_T\sqrt{n\log q}}$. This condition is satisfied for all $y\in \supp(f_{k,b}(x))$ provided $B_P$ is chosen so that
+\begin{equation}\label{eq:trapdoortwotoonerequirement}
+		 B_P \leq \frac{q}{C_T\sqrt{mn\log q}}\;.
+\end{equation}
+\item[(b)] \textit{$2$-to-$1$.} We let $\mathcal{R}_k$ be the set of all pairs $(x_0,x_1)$ such that $f_{k,0}(x_0) = f_{k,1}(x_1)$. By definition this occurs if and only if $x_1 = x_0 - \*s$, and so $\mathcal{R}_k$ is a perfect matching. 
+\end{enumerate}
+
+
+\subsection{Efficient Range Superposition} 
+For $k=(\*A,\*A\*s+\*e)\in \mathcal{K}_{\mathcal{F}_{\lwe}}, b\in\{0,1\}$ and $x\in \sX$,
+let
+\begin{equation}\label{eq:defprobdensitymodified}
+    (f'_{k,b}(x))(y) \,=\, D_{\mZ_q^m,B_P}(y - \*Ax - b\cdot (\*A\*s + \*e))\;.
+\end{equation}
+Note that $f'_{k,0}(x) = f_{k,0}(x)$ for all $x\in \sX$. The distributions $f'_{k,1}(x)$ and $f_{k,1}(x)$ are shifted by $\*e$. Given the key $k$ and $x\in\sX$, the densities $f'_{k,0}(x)$ and $f'_{k,1}(x)$ are efficiently computable. For all $x\in \sX$,
+\begin{eqnarray}
+\supp(f'_{k,0}(x)) &=& \supp(f_{k,0}(x))\;,\\
+\supp(f'_{k,1}(x)) &=& \big\{y \in \sY\, |\; y = \*Ax + \*e_0 + \*A\*s + \*e, \; \|\*e_0\|\leq B_P\sqrt{m}\big\}\;.\label{eq:fprime1}
+\end{eqnarray}
+\begin{enumerate}
+\item[(a)] Using that $B_V < B_P$, it follows that the norm of the term $\*e_0 + \*e$ in~\eqref{eq:fprime1} is always at most $2B_P\sqrt{m}$. Therefore, the inversion procedure $\textrm{INV}_{\mathcal{F}_{\lwe}}$ can be guaranteed to return $x$ on input $t_{\*A}$, $b\in \{0,1\}$, $y\in \supp(f'_{k,b}(x))$ if we strengthen the requirement on $B_P$ given in~\eqref{eq:trapdoortwotoonerequirement} to
+\begin{equation}\label{eq:superpositiontrapdoorrequirement}
+    B_P \,\leq\, \frac{q}{2C_T\sqrt{mn\log q}}\;.
+\end{equation}
+This strengthened trapdoor requirement also implies that for all $b\in \{0,1\}$, $(x_0,x_1)\in\mathcal{R}_k$, and $y\in \supp(f'_{k,b}(x_b))$, INV$_{\mathcal{F}_{\lwe}}(t_{\*A},b\oplus 1,y) = x_{b\oplus 1}$. 
+\item[(b)] On input $k = (\*A,\*A\*s + \*e)$, $b\in\{0,1\}$, $x \in \sX$, and $y\in\sY$, the procedure CHK$_{\mathcal{F}_{\lwe}}$ operates as follows. If $b=0$, it computes $\*e' = y - \*Ax$. If $\|\*e'\| \leq B_P\sqrt{m}$, the procedure returns $1$, and $0$ otherwise. If $b = 1$, it computes $\*e' = y - \*Ax - (\*A\*s + \*e)$. If $\|\*e'\| \leq B_P\sqrt{m}$, it returns $1$, and $0$ otherwise. 
+
+\item[(c)] 
+We bound the Hellinger distance between the densities $f_{k,b}(x)$ and $f'_{k,b}(x)$. If $b=0$ they are identical. If $b=1$, both densities are shifts of $D_{\mZ_q^m,B_P}$, where the shifts differ by $\*e$. Each coordinate of $\*e$ is drawn independently from $D_{\mZ_q,B_V}$, so $\|\*e\|\leq \sqrt{m}B_V$. Applying Lemma~\ref{lem:distributiondistance}, we get that 
+\begin{eqnarray*}
+H^2(f_{k,1}(x),f'_{k,1}(x))\,\leq \, 1 - e^{\frac{-2\pi mB_V}{B_P}}\;.
+\end{eqnarray*}
+It remains to describe the  procedure SAMP$_{\mathcal{F}_{\lwe}}$. At the first step, the procedure creates the following superposition
+\begin{equation}\label{eq:discretesup}
+\sum_{\*e_0\in \mZ_q^m} \sqrt{D_{\mZ_q^m,B_P}(\*e_0)}\ket{\*e_0}\;.
+\end{equation}
+The state can be prepared efficiently as described in~\cite[Lemma 3.12]{regev2005}.\footnote{Specifically, the state can be created using a technique by Grover and Rudolph (\cite{distributionsuperpositions}) who show that in order to create such a state, it suffices have the ability to efficiently compute the sum $\sum\limits_{x=c}^d D_{\mZ_q,B_P}(x)$  for any $c,d\in\{-\lfloor\sqrt{B_P}\rfloor,\ldots,\lceil\sqrt{B_P}\rceil\}\subseteq \mZ_q$  and to within good precision. This can be done using standard techniques used in sampling from the normal distribution.}
+
+At the second step, the procedure creates a uniform superposition over $x\in \sX$, yielding the state
+\begin{equation}
+q^{-\frac{n}{2}}\sum_{\substack{x\in \sX \\ \*e_0\in \mZ_q^{m}}} \sqrt{D_{\mZ_q^m,B_P}(\*e_0)}\ket{x}\ket{\*e_0}\;.
+\end{equation}
+At the third step, using the key $k = (\*A,\*A\*s + \*e)$ and the input bit $b$ the procedure computes  
+\begin{equation}\label{eq:priortoerasingerror}
+q^{-\frac{n}{2}}\sum_{\substack{x\in \sX \\ \*e_0\in \mZ_q^{m}}} \sqrt{D_{\mZ_q^m,B_P}(\*e_0)}\ket{x}\ket{\*e_0}\ket{\*Ax + \*e_0 + b\cdot (\*A\*s + \*e)}\;.
+\end{equation}
+At this point, observe that $\*e_0$ can be computed from $x$, the last register, $b$ and the key $k$. The procedure can then erase the register containing $\*e_0$, yielding 
+\begin{align}
+q^{-\frac{n}{2}}&\sum_{\substack{x\in \sX \\ \*e_0\in \mZ_q^{m}}} \sqrt{D_{\mZ_q^m,B_P}}(\*e_0)\ket{x}\ket{\*Ax + \*e_0 + b\cdot (\*A\*s + \*e)}\nonumber\\
+&=q^{-\frac{n}{2}}\sum_{x\in \sX , y\in \sY}\sqrt{D_{\mZ_q^m,B_P}(y - \*Ax - b\cdot(\*A\*s + \*e))}\ket{x}\ket{y}\nonumber\\
+&=  q^{-\frac{n}{2}}\sum_{x\in \sX ,y\in\sY}\sqrt{(f'_{k,b}(x))(y)}\ket{x}\ket{y}\;.\label{eq:fprimestate}
+\end{align}
+
+\end{enumerate}
+
+
+
+
+\subsection{Adaptive Hardcore Bit} 
+\label{sec:adaptive-bit}
+This section is devoted to the proof of the adaptive hardcore bit condition. The main statement is provided in Lemma~\ref{lem:lweadaptivehardcore} in Section~\ref{sec:hc-lemma}. The proof of the lemma proceeds in three steps. First, in Section~\ref{sec:moderate} we establish some preliminary results on the distribution of the inner product $(\hat{d}\cdot s \bmod 2)$, where $\hat{d}\in\{0,1\}^n$ is a fixed nonzero binary vector and $s\leftarrow_U \{0,1\}^n$ a uniformly random binary vector, conditioned on $\*C\*s=\*v$ for some randomly chosen matrix $\*C\in \mZ_q^{\ell\times n}$ and arbitrary $\*v\in\mZ_q^{\ell}$. This condition is combined with the LWE assumption in Section~\ref{sec:lwehc} to argue that  $(\hat{d}\cdot s \bmod 2)$ remains computationally close to uniform even when the matrix $\*C$ is an LWE matrix $\*A$, and the adversary is able to choose $\hat{d}$ after being given access to $\*A\*s+\*e$ for some error vector $\*e\in\mZ_q^m$. Finally, in Section~\ref{sec:hc-lemma} the required hardcore bit condition is reduced to the one established in  Section~\ref{sec:lwehc} by relating the inner product appearing in the definition of $H_k$ (in condition 4(b) of Definition \ref{def:trapdoorclawfree}) to an inner product of the form $\hat{d}\cdot s$, where $\hat{d}$ can be efficiently computed from $d$.  
+
+\subsubsection{Moderate matrices}
+\label{sec:moderate}
+
+The following lemma argues that, provided the matrix $\*C \in\mZ_q^{\ell\times n}$ is a uniformly random matrix with sufficiently few rows, the distribution $(\*C,\*C\*s)$ for arbitrary $s \in \{0,1\}^n$ does not reveal any parity of $s$.  
+
+\begin{lemma}\label{lem:hardcore-1}
+Let $q$ be a prime, $\ell,n\geq 1$ be integers, and $\*C\in \mZ_q^{\ell\times n}$ be a uniformly random matrix. With probability at least $1-q^\ell\cdot 2^{-\frac{n}{8}}$ over the choice of $\*C$ the following holds: for a fixed $\*C$, all $\*v\in\mZ_q^\ell$ and $\hat{d}\in \{0,1\}^n\setminus\{0^n\}$, the distribution of $(\hat{d}\cdot s \bmod 2)$, where $s$ is uniform in $\{0,1\}^n$ conditioned on $\*C\*s = \*v$, is within  statistical distance $O(q^{\frac{3\ell}{2}} \cdot 2^{-\frac{n}{40}})$ of the uniform distribution over $\{0,1\}$. 
+%Let $\mathcal{A}: \mZ_q^{\ell\times n} \times \mZ_q^\ell \to \{0,1\}^n\backslash \{0^n\}$ be an arbitrary function. Then the distributions
+%\begin{eqnarray}\label{eq:l14-1}
+%\mathcal{D}'_0 \,=\,big(C \leftarrow_U \mZ_q^{\ell\times n},\; \*C\*s,\;\*d \leftarrow \mathcal{A}(C,\*C\*s),\; \* d \cdot \*s \mod 2\big) 
+%\end{eqnarray}
+%and
+%\begin{eqnarray}\label{eq:l14-2}
+%\mathcal{D}'_1 \,=\,\big(C,\; \*C\*s,\; \*d \leftarrow \mathcal{A}(C,\*C\*s),\; r\leftarrow_U \{0,1\}\big) \;
+%\end{eqnarray}
+%where in both cases $\*s \leftarrow_U \{0,1\}^n$,
+%have statistical distance $O(q^{\frac{3\ell}{2}} 2^{-\frac{n}{40}})$.
+\end{lemma}
+
+To prove the lemma we introduce the notion of a \emph{moderate} matrix.  
+
+\begin{definition}\label{def:moderate}
+Let $\*b\in \mZ_q^n$. We say that $\*b$ is \textnormal{moderate} if it contains at least $\frac{n}{4}$ entries whose unique representative in $(-q/2,q/2]$ has its absolute value in the range $(\frac{q}{8},\frac{3q}{8}]$. A matrix $\*C\in \mZ_q^{\ell\times n}$ is moderate if its entire row span (except $0^n$) is moderate.
+\end{definition}
+
+\begin{lemma}\label{lem:moderate}
+Let $q$ be prime and $\ell,n$ be integers. Then 
+$$\Pr_{\*C\leftarrow_U \mZ_q^{\ell\times n}}\big[\text{$\*C$ is moderate}\big]\,\geq \, 1 - q^\ell \cdot 2^{-\frac{n}{8}}\;.$$ 
+\end{lemma}
+
+\begin{proof}
+Consider an arbitrary non zero vector $\*b$ in the row-span of a uniform $\*C$. Then the marginal distribution of $\*b$ is uniform. By Chernoff, $\*b$ is moderate with probability at least $1 - e^{-\frac{2n}{16}}\geq 1 - 2^{-\frac{n}{8}}$. Applying the union bound over all at most $q^{\ell} - 1$ non zero vectors in the row span, the result follows. 
+\end{proof}
+
+
+\begin{lemma}\label{lem:singled}
+Let $\*C\in \mZ_q^{\ell\times n}$ be an arbitrary moderate matrix and let $\hat{d}\in\{0,1\}^n\setminus\{0^n\}$ be an arbitrary non zero binary vector. Let $s$ be uniform over $\{0,1\}^n$ and consider the random variables $\*v = \*C\*s \bmod q$ and $z = \hat{d}\cdot s \bmod 2$. Then $(\*v,z)$ is within total variation distance at most $q^{\frac{\ell}{2}}\cdot 2^{-\frac{n}{40}}$ of the uniform distribution over $\mZ_q^{\ell}\times\{0,1\}$. 
+\end{lemma}
+
+\begin{proof}
+Let $f$ be the probability density function of $(\*v,z)$. Interpreting $z$ as an element of $\mZ_2$, let $\hat{f}$ be the Fourier transform over $\mZ_q^{\ell}\times \mZ_2$. Let $U$ denote the density of the uniform distribution over $\mZ_q^{\ell}\times \mZ_2$. Applying the Cauchy-Schwarz inequality,
+\begin{align}
+\frac{1}{2}\big\| f - U \big \|_1 &\leq \sqrt{\frac{q^\ell}{2}} \big\| {f} - {U} \big\|_2 \notag \\
+&= \frac{1}{2} \big\| \hat{f} - \hat{U} \big\|_2 \notag \\
+&= \frac{1}{2} \Big( \sum_{(\hat{\*v},\hat{z})\in \mZ_q^\ell \times \mZ_2\backslash\{(\*0,0)\}} \big| \hat{f}(\hat{\*v},\hat{z})\big|^2\Big)^{1/2}\;,\label{eq:fc-1}
+\end{align}
+where the second line follows from Parseval's identity, and for the third line we used $\hat{f}(\*0,0)=\hat{U}(0,0)=1$ and $\hat{U}(\hat{\*v},\hat{z})=0$ for all $(\hat{\*v},\hat{z})\neq(0^\ell,0)$. To bound~\eqref{eq:fc-1} we estimate the Fourier coefficients of $f$. Denoting $\omega_{2q} = e^{-\frac{2\pi i}{2q}}$, for any $(\hat{\*v},\hat{z}) \in \mZ_q^\ell \times \mZ_2$ we can write 
+\begin{align}
+\hat{f}({\hat{\*v}},{\hat{z}}) &= \mathop{\mathbb{E}}\limits_{\*s}\Big[\omega_{2q}^{(2\cdot {\hat{\*v}}^TC + q\cdot {\hat{z}}\hat{\*d}^T)\*s}\Big]\notag\\
+&= \mathop{\mathbb{E}}\limits_{\*s}\big[\omega_{2q}^{\*w^T\*s}\big] \notag\\
+&= \prod_i\mathop{\mathbb{E}}\limits_{s_i}\big[\omega_{2q}^{w_is_i}\big]\;,\label{eq:fc-3}
+\end{align}
+where we wrote $\*w^T = 2\cdot {\hat{\*v}}^T\*C + q\cdot {\hat{z}}\hat{\*d}^T\in \mZ_{2q}^n$. It follows that $\hat{f}(0^\ell,1)=0$, since $(d\cdot s \mod 2)$ is uniform for $s$ uniform.  
+
+We now observe that for all $i\in\{1,\ldots,n\}$ such that the representative of $({\hat{\*v}}^T\*C)_i$ in $(-q/2,q/2]$ has its absolute value in $(\frac{q}{8},\frac{3q}{8}]$ it holds that $\frac{w_i}{q}\in (\frac{1}{4},\frac{3}{4}]\bmod 1$, in which case
+\begin{equation}
+\big|\mathop{\mathbb{E}}\limits_{s_i}[\omega_{2q}^{w_is_i}]\big| \,=\, \Big|\cos\Big(\frac{\pi}{2}\cdot \frac{w_i}{q}\Big)\Big| \,\leq\, \cos\Big(\frac{\pi}{8}\Big)\,\leq\, 2^{-\frac{1}{10}}\;.
+\end{equation}
+Since $\*C$ is moderate, there are at least $\frac{n}{4}$ such entries, so that from~\eqref{eq:fc-3} it follows that $|\hat{f}({\hat{\*v}},{\hat{z}})|\leq 2^{-\frac{n}{40}}$ for all $\hat{\*v} \neq \*0$. Recalling~\eqref{eq:fc-1}, the lemma is proved.  
+\end{proof}
+
+
+We now prove Lemma \ref{lem:hardcore-1} by generalizing Lemma \ref{lem:singled} to adaptive $d$ (i.e. $d$ can  depend on $\*C, \*C\*s$).
+
+\begin{proof}{\textbf{Lemma \ref{lem:hardcore-1}}}
+We assume $\*C$ is moderate; by Lemma \ref{lem:moderate}, $\*C$ is moderate with probability at least $1-q^\ell\cdot 2^{-\frac{n}{8}}$. Let $s$ be uniform over $\{0,1\}^n$, $D_1 = (\*C\*s,\hat{d}\cdot s \bmod 2)$, and $D_2$ uniformly distributed over $\mZ_q^{\ell}\times \{0,1\}$. Using that $\*C$ is moderate, it follows from Lemma \ref{lem:singled} that 
+\begin{equation}\label{eq:fc-4}
+\epsilon\,=\,\|D_1-D_2\|_{TV} \,\leq\, q^{\frac{\ell}{2}}\cdot 2^{\frac{-n}{40}}\;.
+\end{equation}
+ Fix $\*v_0 \in \mZ_q^\ell$ and let 
+\begin{eqnarray}\label{eq:fixeddistance}
+\Delta \,=\, \frac{1}{2}\sum_{b\in \{0,1\}}\Big|\Pr_{s \leftarrow_U \{0,1\}^n}\big[\hat{d}\cdot s \bmod 2 = b \,\big| \, \*C\*s = \*v_0\big] - \frac{1}{2}\Big|\;.
+\end{eqnarray}
+To prove the lemma it suffices to establish the appropriate upper bound on $\Delta$, for all $\*v_0$. By definition, 
+\begin{eqnarray}
+\epsilon\,=\,\|D_1-D_2\|_{TV} &=& \frac{1}{2}\sum_{b\in \{0,1\}, v\in \mZ_q^{\ell}}\Big|\Pr\big[\*C\*s = \*v\big] \Pr\big[\hat{d}\cdot s \bmod 2 = b \,\big|\, \*C\*s = \*v\big] - \frac{1}{2q^\ell} \Big|\notag\\
+&\geq& \frac{1}{2}\sum_{b\in \{0,1\}}\Big|\Pr\big[\*C\*s = \*v_0\big] \Pr\big[\hat{d}\cdot s \bmod 2 = b \,\big|\, \*C\*s = \*v_0\big] - \frac{1}{2q^\ell} \Big|\notag\\
+&=& \frac{1}{2}\sum_{b\in \{0,1\}}\Big|\Pr\big[\*C\*s = \*v_0\big] \Big(\frac{1}{2} + (-1)^b\Delta\Big) - \frac{1}{2q^\ell} \Big|\;,\label{eq:afterfixeddistanceplugin}
+\end{eqnarray}
+where all probabilities are under a uniform choice of $s\leftarrow_U \{0,1\}^n$, and the last line follows from the definition of $\Delta$ in~\eqref{eq:fixeddistance}. Applying the inequality $|a|+|b| \geq \max(|a-b|,|a+b|)$, valid for any real $a,b$, to~\eqref{eq:afterfixeddistanceplugin} it follows that 
+\begin{equation}
+\Pr\big[\*C\*s = \*v_0\big]\cdot \Delta \,\leq\, \epsilon\qquad \text{and} \qquad 
+\Pr\big[\*C\*s = \*v_0\big] \,\geq \,\frac{1}{q^\ell} - 2\epsilon\;.\label{eq:afterfixeddistanceplugin-2}
+\end{equation}
+If $q^{3\ell/2} 2^{-\frac{n}{40}} > \frac{1}{3}$ the bound claimed in the lemma is trivial. If $q^{3\ell/2} 2^{-\frac{n}{40}} \leq \frac{1}{3}$, then $\epsilon q^\ell \leq \frac{1}{3}$, so it follows from~\eqref{eq:afterfixeddistanceplugin-2} that $\Delta \leq 3q^\ell\epsilon$, which together with~\eqref{eq:fc-4} proves the lemma. 
+\end{proof}
+
+
+%\begin{proofof}{\textbf{Lemma \ref{lem:hardcore-1}}}
+%Using Lemma \ref{lem:moderate}, the distribution~\eqref{eq:l14-1} is within statistical distance at most $q^{\ell}2^{-\frac{n}{8}}$ of the distribution: 
+%\begin{eqnarray*}\label{eq:uniformtomoderatedist}
+%\big(C,\; \*C\*s,\; \*d\leftarrow \mathcal{A}(C,\*C\*s),\; \*d\cdot \*s\big)\;, 
+%\end{eqnarray*}
+%where $\*s\leftarrow_U \{0,1\}^n$ and $C\in \mZ_q^{\ell\times n}$ is uniform, conditioned on being a moderate matrix. By Corollary \ref{corol:alld}, the distribution~\eqref{eq:uniformtomoderatedist} is within statistical distance at most $3q^{\frac{3\ell}{2}}2^{-\frac{n}{40}}$ of the distribution
+%\begin{eqnarray*}
+%\big(C,\; \*C\*s,\; \*d \leftarrow \mathcal{A}(C,\*C\*s),\; r\leftarrow_U \{0,1\}\big) \;,
+%\end{eqnarray*}
+%where $\*s\leftarrow_U \{0,1\}^n$ and $C\in \mZ_q^{\ell\times n}$ is uniform, conditioned on being a moderate matrix. Applying Lemma \ref{lem:moderate} once more completes the proof. 
+%\end{proofof}
+
+
+\subsubsection{LWE Hardcore bit}
+\label{sec:lwehc}
+
+The next step is to use Lemma~\ref{lem:hardcore-1} to obtain a form of the hardcore bit statement that is appropriate for our purposes. In this section we use the notation introduced in Section~\ref{sec:lweprelim}. We also use the following notation: we write $s\in\{0,1\}^n$ as $s = (s_0,s_1)$, where $s_0,s_1\in\{0,1\}^{\frac{n}{2}}$ are the $\frac{n}{2}$-bit prefix and suffix of $s$ respectively (for simplicity, assume $n$ is even; if not, ties can be broken arbitrarily). We will show computational indistinguishability based on the hardness assumption $\lwe_{\ell,q,D_{\mZ_q,B_L}}$ (described at the start of Section \ref{sec:lwetcf}).\\ 
+
+For reasons that will become clear in the next section, we consider adversaries that output a tuple $(b,x,d,c)\in \{0,1\}\times \sX\times \{0,1\}^w \times \{0,1\}$.
+
+\begin{lemma}\label{lem:lweadaptiveleakage}
+Assume a choice of parameters satisfying the conditions~\eqref{eq:assumptions}. Assume the hardness assumption $\lwe_{\ell,q,D_{\mZ_q,B_L}}$ holds. Let
+$$\mathcal{A}:\, \mZ_q^{m\times n} \times \mZ_q^m \,\to\,\{0,1\}\times \sX \times \{0,1\}^w \times\{0,1\}$$
+be a quantum polynomial-time procedure. For $b\in\{0,1\}$ and $x\in\sX$ let $I_{b,x}:\{0,1\}^w \to \{0,1\}^n$ be an efficiently computable map. For every $s = (s_0,s_1)\in\{0,1\}^n$ and $(b,x)\in\{0,1\}\times\sX$, let $\hat{C}_{s_{b\oplus 1},b,x}\subseteq \{0,1\}^w$ be a set depending only on $b,x$ and $s_{b\oplus 1}$ and such that for all $d\in \hat{C}_{s_{b\oplus 1},b,x}$ the first (if $b=0$) or last (if $b=1$) $\frac{n}{2}$ bits of $I_{b,x}(d)$ are not all $0$.
+ Then the distributions
+\begin{eqnarray}\label{eq:l14-1}
+\mathcal{D}_0 \,=\, \big( (\*A,\*A\*s+\*e) \leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda}) ,\; (b,x,d,c) \leftarrow \mathcal{A}(\*A,\*A\*s+\*e),\; I_{b,x}(d) \cdot s \mod 2\big) 
+\end{eqnarray}
+and
+\begin{eqnarray}\label{eq:l14-2}
+\mathcal{D}_1 \,=\, \big( (\*A,\*A\*s+\*e) \leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda}) ,\;(b,x,d,c) \leftarrow \mathcal{A}(\*A,\*A\*s+\*e), \; (\delta_{d\in \hat{C}_{s_{b\oplus 1},b,x}} r) \oplus (I_{b,x}(d) \cdot s\mod 2) \big)\;, 
+\end{eqnarray}
+where $r\leftarrow_U \{0,1\}$ and $\delta_{d\in \hat{C}_{s_{b\oplus 1},s,x}}$ is $1$ if $d\in \hat{C}_{s_{b\oplus 1},b,x}$ and $0$ otherwise, are computationally indistinguishable. 
+\end{lemma}
+
+\begin{proof}
+We prove computational indistinguishability by introducing a sequence of hybrids. For the first step we let 
+\begin{eqnarray}\label{eq:initialtolossy}
+\mathcal{D}^{(1)} \,=\, \big((\tilde{\*A}, \tilde{\*A}\*s + \*e),\; (b,x,d,c)\leftarrow \mathcal{A}(\tilde{\*A},\tilde{\*A}\*s + \*e),\; I_{b,x}(d)\cdot s \mod 2\big)\;,
+\end{eqnarray}
+where $\tilde{\*A} = \*B\*C + \*F \leftarrow \lossy(1^n,1^m,1^\ell,q,D_{\mZ_q,B_L})$ is sampled from a lossy sampler (see Definition~\ref{def:lossy}). From the definition, $\*F\in \mZ_q^{m\times n}$ has entries i.i.d.\ from the distribution $D_{\mZ_q,B_L}$ over $\mZ_q$. To see that $\mathcal{D}_{0}$ and $\mathcal{D}^{(1)}$ are computationally indistinguishable, first note that the distribution of matrices $\*A$ generated by $\textrm{GEN}_{\mathcal{F}_{\lwe}}$ is negligibly far from the uniform distribution (see Theorem~\ref{thm:trapdoor}). Next, by Theorem~\ref{thm:lossy}, under the $\lwe_{\ell,q,D_{\mZ_q,B_L}}$ assumption a uniformly random matrix $\*A$ and a lossy matrix $\tilde{\*A}$ are computationally indistinguishable. Note that this step, as well as subsequent steps, uses that $\mathcal{A}$ and $I_{b,x}$ are efficiently computable. 
+
+For the second step we remove the term $\*F\*s$ from the lossy LWE sample $\tilde{\*A}\*s + \*e$ to obtain the distribution
+\begin{eqnarray}\label{eq:lossystatdistance}
+\mathcal{D}^{(2)} \,=\, \big( (\*B\*C+\*F, \*B\*C\*s + \*e),\; (b,x,d,c)\leftarrow \mathcal{A}(\*B\*C + \*F,\*B\*C\*s + \*e),\; I_{b,x}(d) \cdot s\mod 2\big) \;.
+\end{eqnarray}
+Using that $\*s$ is binary and the entries of $\*F$ are taken from a $B_L$-bounded distribution, it follows that $\|\*F\*s\|\leq n\sqrt{m}B_L$. Applying Lemma~\ref{lem:distributiondistance}, it follows that the statistical distance between $\mathcal{D}^{(1)}$ and $\mathcal{D}^{(2)}$ is at most 
+\begin{equation}\label{eq:def-gamma}
+\gamma \,=\, \sqrt{2}\Big(1 - e^{\frac{-2\pi mnB_L}{B_V}}\Big)^{1/2}\;,
+\end{equation}
+which is negligible, due to the requirement that $\frac{B_V}{B_L}$ is superpolynomial given at the start of Section \ref{sec:lwetcf}.
+
+For the third step, observe that the distribution $\mathcal{D}^{(2)}$ in~\eqref{eq:lossystatdistance} only depends on $s_b$ through $\*C\*s$ and $I_{b,x}(d)\cdot s$, where $\*C$ is uniformly random. It follows from Lemma~\ref{lem:hardcore-1} that provided $\frac{n}{2}=\Omega(\ell\log q)$, with overwhelming probability over the choice of $\*C$, if we fix all variables except for $s_b$, the resulting distribution of $(I_{b,x}(d) \cdot s \mod 2)$ is statistically indistinguishable from $r\leftarrow_U \{0,1\}$ as long as the $\frac{n}{2}$ bits of  $I_{b,x}(d)$ associated with $s_b$ are not all $0$ (i.e. the first $\frac{n}{2}$ bits if $b = 0$ or the last $\frac{n}{2}$ bits if $b = 1$). Using that since $d\in \hat{C}_{s_{b\oplus 1},b,x}$, by assumption the $\frac{n}{2}$ bits of  $I_{b,x}(d)$ associated with $s_b$ are not all $0$,  the distribution 
+ $\mathcal{D}^{(2)}$ in~\eqref{eq:lossystatdistance} is statistically indistinguishable from 
+\begin{eqnarray}\label{eq:distreplacewithr}
+\mathcal{D}^{(3)} \,=\,\big( (\*B\*C+\*F, \*B\*C\*s + \*e),\; (b,x,d,c)\leftarrow \mathcal{A}(\*B\*C + \*F,\*B\*C\*s + \*e),\; (\delta_{d\in \hat{C}_{s_{b\oplus 1},b,x}} r )\oplus (I_{b,x}(d)\cdot s\mod 2))\big)\;, 
+\end{eqnarray}
+where $r\leftarrow_U \{0,1\}$ and $\delta_{d\in \hat{C}_{s_{b\oplus 1},s,x}}$ is $1$ if $d\in \hat{C}_{s_{b\oplus 1},b,x}$ and $0$ otherwise. %Note that the dependence of $\hat{C}_{s_{b\oplus 1},b,x}$ on $s_{b\oplus 1}$ does not prevent the application of Lemma~\ref{lem:hardcore-1}, since we are using the randomness of $s_b$ (not $s_{b\oplus 1}$) to apply the lemma.
+
+
+For the fourth step we reinsert the term $F\*s$ to obtain
+\begin{eqnarray}\label{eq:distbacktolossy}
+\mathcal{D}^{(4)} \,=\, \big(\tilde{\*A}, \tilde{\*A}\*s + \*e,\; (b,x,d,c)\leftarrow \mathcal{A}(\tilde{\*A},\tilde{\*A}\*s + \*e),\; (\delta_{d\in \hat{C}_{s_{b\oplus 1},b,x}} r) \oplus (I_{b,x}(d) \cdot s\mod 2) \big)\;. 
+\end{eqnarray}
+Statistical indistinguishability between $\mathcal{D}^{(3)}$ and $\mathcal{D}^{(4)}$ follows similarly as between $\mathcal{D}^{(1)}$ and $\mathcal{D}^{(2)}$.
+Finally, computational indistiguishability between $\mathcal{D}^{(4)}$ and $\mathcal{D}_1$ follows similarly to between $\mathcal{D}^{(1)}$ and $\mathcal{D}_0$.
+\end{proof}
+
+
+
+\subsubsection{Adaptive hardcore lemma}
+\label{sec:hc-lemma}
+We now prove that condition 4 of Definition \ref{def:trapdoorclawfree} holds. 
+Recall that $\sX=\mZ_q^n$ and $w=n\lceil \log q \rceil$. Let $\inj:\sX\to\{0,1\}^w$  be such that $\inj(x)$ returns the binary representation of $x\in\sX$. For $b\in\{0,1\}$, $x\in \sX$, and $d\in\{0,1\}^w$, let
+ $I_{b,x}(d) \in \{0,1\}^n$ be the vector whose each coordinate is obtained by taking the inner product mod $2$ of the corresponding block of $\lceil\log q\rceil$ coordinates of $d$ and of $\inj(x)\oplus \inj(x-(-1)^b\*1 )$, where $\*1 \in \mZ_q^n$ is the vector with all its coordinates equal to $1\in\mZ_q$. For $k = (\*A,\*A\*s + \*e), b\in\{0,1\}$ and $x\in\sX$, we define the set $C_{k,b,x}$ as 
+$$ C_{k,b,x}\,=\,\Big\{d\in \{0,1\}^w\,\Big|\; \exists i\in\Big\{b\,\frac{n}{2},\ldots,b\,\frac{n}{2}+\frac{n}{2}\Big\}:\,(I_{b,x}(d))_i \neq 0 \Big\}.$$
+Observe that for all $b\in \{0,1\}$ and $x\in \sX$, if $d$ is sampled uniformly at random, $d\notin C_{k,b,x}$ with negligible probability. This follows simply because for any $b\in\{0,1\}$, $\inj(x)\oplus \inj(x-(-1)^b\*1)$ is non-zero, since $\inj$ is injective. Observe also that checking membership in $C_{k,b,x}$ is possible given only $b,x$. This shows condition 4(a) in the adaptive hardcore bit condition in Definition~\ref{def:trapdoorclawfree}.
+
+Given $(x_0,x_1)\in\mathcal{R}_k$ (where $k = (\*A,\*A\*s + \*e)$), recall from Section \ref{sec:trapdoortwotoonereq} that $x_1 = x_0 - \*s$. For convenience we also introduce the following set: 
+\begin{equation}\label{eq:def-hatc}
+\hat{C}_{s_1,0,x_0} \,=\, \hat{C}_{s_0,1,x_1}\,=\, C_{k,0,x_0}\cap C_{k,1,x_1}\;.
+\end{equation}
+%The set $\hat{C}$ is written with subscript $s_b$ rather than $k$ to emphasize its dependence on \textit{only} $s_{b\oplus 1},b$ and $x_b$. 
+
+The following lemma establishes item 4(b) in the adaptive hardcore bit condition of Definition~\ref{def:trapdoorclawfree}. 
+
+\begin{lemma}\label{lem:lweadaptivehardcore} 
+Assume a choice of parameters satisfying the conditions~\eqref{eq:assumptions}. Assume the hardness assumption $\lwe_{\ell,q,D_{\mZ_q,B_L}}$ holds. Let $s\in\{0,1\}^n$. For $(b,x)\in\{0,1\}\times\sX$ let $ \hat{C}_{s_{b\oplus 1},b,x}$ be the set defined in~\eqref{eq:def-hatc}. Let \footnote{We write the sets as $H_s$ instead of $H_k$ to emphasize the dependence on $s$. Also, recall the definition of $\mathcal{R}_k$ in Section \ref{sec:trapdoortwotoonereq} and the definition of $\hat{C}_{s_{b\oplus 1},b,x}$ in \eqref{eq:def-hatc}, that relates it to the set $C_{k,b,x}$ appearing in the definition of the adaptive hardcore bit condition.}
+\begin{eqnarray}
+H_s &=& \big\{(b,x,d,d\cdot(\inj(x)\oplus \inj( x - (-1)^b \*s )))\,|\; b\in \{0,1\},\, x\in \sX,\, d\in \hat{C}_{s_{b\oplus 1},b,x}  \big\}\;,\label{eq:def-h}\\
+\overline{H}_s &=& \big\{(b,x,d,c) \,|\; (b,x,d,c\oplus 1) \in H_s\big\}\;.
+\end{eqnarray}
+Then for any quantum polynomial-time procedure 
+$$\mathcal{A}:\, \mZ_q^{m\times n} \times \mZ_q^m \,\to\,\{0,1\}\times \sX \times \{0,1\}^w \times\{0,1\}$$
+ there exists a negligible function $\mu(\lambda)$ such that 
+\begin{equation}\label{eq:lwebitattackeradvantage}
+\Big|\Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in H_s\big] - \Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in \overline{H}_s\big]\Big| \,\leq\, \mu(\lambda)\;.
+\end{equation} 
+\end{lemma}
+
+\begin{proof}
+The proof is by contradiction. Assume that there exists a quantum polynomial-time procedure $\mathcal{A}$ such that the left-hand side of~\eqref{eq:lwebitattackeradvantage} is at least some non-negligible function $\eta(\lambda)$. We derive a contradiction by showing that the two distributions $\mathcal{D}_0$ and $\mathcal{D}_1$ in Lemma~\ref{lem:lweadaptiveleakage}, for $I_{b,x}$ defined at the start of this section and $\hat{C}_{s_{b\oplus 1},b,x}$ defined in \eqref{eq:def-hatc}, are computationally distinguishable, giving a contradiction. 
+
+Let $(\*A,\*A\*s+\*e) \leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})$ and $(b,x,d,c) \leftarrow \mathcal{A}(\*A,\*A\*s+\*e)$. To link $\mathcal{A}$ to the distributions in Lemma~\ref{lem:lweadaptiveleakage} we relate the inner product condition in~\eqref{eq:def-h} to an inner product $\hat{d} \cdot s$ of the form appearing in~\eqref{eq:l14-1}, for $\hat{d} = I_{b,x}(d)$ that can be computed efficiently from $b,x$ and $d$. This is based on the following claim. 
+
+\iffalse
+\begin{claim}\label{cl:dependenceonsecret}
+Let $x_0,x_1\in \sX$ be such that $x_{1} = x_0 -  \*s$ for some $s \in \{0,1\}^n$. Then for any $b\in\{0,1\}$ and $d \in \{0,1\}^{w}$ the following equality holds:
+\begin{equation}\label{eq:def-hatd}
+d\cdot(\inj(x_0)\oplus \inj(x_1)) \,=\,  I_{b,x}(d)\cdot s \;.
+\end{equation}
+Moreover, the function $I_{b,x}$ is efficiently computable (given $b,x$), and $I_{b,x}(d)\neq 0^n$ whenever $d\in \hat{C}_{s,b,x}$, the set defined in~\eqref{eq:def-hatc}. 
+\end{claim}
+\fi
+
+\begin{claim}\label{cl:dependenceonsecret}
+For all $b\in\{0,1\},x\in \sX, d\in\{0,1\}^w$ and $s\in\{0,1\}^n$ the following equality holds:
+\begin{equation}\label{eq:def-hatd}
+d\cdot(\inj(x)\oplus \inj( x - (-1)^b \*s ) \,=\,  I_{b,x_b}(d)\cdot s \;.
+\end{equation}
+Moreover, the function $I_{b,x}$ is efficiently computable given $b,x$. 
+\end{claim}
+
+\begin{proof}
+We do the proof in case $n=1$ and $w=\lceil\log q\rceil$, as the case of general $n$ follows by linearity. In this case $s$ is a single bit. If $s=0$ then both sides of~\eqref{eq:def-hatd} evaluate to zero, so the equality holds trivially. It then suffices to define $ I_{b,x_b}(d)$ so that the equation holds when $s=1$. A choice of either of
+\begin{equation}\label{eq:def-hatd-1}
+I_{0,x_0}(d)\,=\, d \cdot (\inj(x_0) \oplus \inj(x_0 -\*1))\;,\quad  I_{1,x_1}(d)\,=\,d \cdot (\inj(x_1) \oplus \inj(x_1 +\*1 ))\;
+\end{equation}
+satisfies all requirements. It is clear from the definition of $I_{b,x}$ (given at the start of this section) that it can be computed efficiently given $b,x$.  
+\end{proof}
+
+The procedure $\mathcal{A}$, the function $I_{b,x}$ defined at the start of this section and the sets $\hat{C}_{s_{b\oplus 1},b,x}$ in~\eqref{eq:def-hatc} fully specify $\mathcal{D}_0$ and $\mathcal{D}_1$. To conclude we construct a distinguisher $\mathcal{A}'$ between $\mathcal{D}_0$ and $\mathcal{D}_1$. Consider two possible distinguishers, $\mathcal{A}'_u$ for $u\in \{0,1\}$. Given a sample $((\*A,\*A\*s+\*e),(b,x,d,c),t)$, $\mathcal{A}'_u$ returns $0$ if $c=t\oplus u$, and $1$ otherwise. First note that:
+\begin{eqnarray}
+\sum_{u\in \{0,1\}} \Big|\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_0}\big[\mathcal{A}_u'(w)=0\big]-\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_1}\big[\mathcal{A}_u'(w)=0\big]\Big|
+\end{eqnarray}
+\begin{eqnarray}
+&=& \sum_{u\in\{0,1\}}\Big|\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_0}\big[\mathcal{A}_u'(w)=0 \wedge d\in \hat{C}_{s_{b\oplus 1},b,x} \big]-\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_1}\big[\mathcal{A}_u'(w)=0 \wedge d\in \hat{C}_{s_{b\oplus 1},b,x}\big]\Big|\label{eq:beforeusingHs}
+\end{eqnarray}
+since if $d\notin \hat{C}_{s_{b\oplus 1},b,x}$, the distributions $\mathcal{D}_0$ and $\mathcal{D}_1$ are identical by definition. Next, if the sample held by $\mathcal{A}'_u$ is from the distribution $\mathcal{D}_0$ and if $(b,x,d,c) \in H_s$, then by the definition of $H_s$ and~\eqref{eq:def-hatd} and it follows that $c = d\cdot(\inj(x)\oplus \inj( x - (-1)^b \*s )  = I_{b,x}(d)\cdot s = t$. If instead $(b,x,d,c)\in \overline{H}_s$ then $c\oplus 1 = d\cdot(\inj(x)\oplus \inj( x - (-1)^b \*s ) = I_{b,x}(d)\cdot s = t$.
+Thus we obtain that the expression in \eqref{eq:beforeusingHs} is equal to: 
+\begin{equation}
+= \Big|\Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in H_s\big] -\frac{1}{2}\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_1}\big[ d\in \hat{C}_{s_{b\oplus 1},b,x}\big]\Big| 
+\end{equation}
+\begin{equation}
++ \Big|\Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in \overline{H}_s\big]-\frac{1}{2}\Pr_{w=(b,x,d,c)\leftarrow \mathcal{D}_1}\big[ d\in \hat{C}_{s_{b\oplus 1},b,x}\big]\Big|\\
+\end{equation}
+\begin{eqnarray}
+&\geq& \Big|\Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in H_s\big] - \Pr_{(\*A,\*A\*s+\*e)\leftarrow \textrm{GEN}_{\mathcal{F}_{\lwe}}(1^{\lambda})}\big[\mathcal{A}(\*A,\*A\*s+\*e) \in \overline{H}_s\big]\Big| \\
+&\geq& \eta
+\end{eqnarray} 
+Therefore, at least one of $\mathcal{A}'_0$ or $\mathcal{A}'_1$ must successfully distinguish between $\mathcal{D}_0$ and $\mathcal{D}_1$ with advantage at least $\frac{\eta}{2}$, a contradiction with the statement of Lemma~\ref{lem:lweadaptiveleakage}. 
+\end{proof}

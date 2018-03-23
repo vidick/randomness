@@ -1,0 +1,66 @@
+
+Let $\lambda$ be a security parameter, and $\sX$ and $\sY$ be finite sets (depending on $\lambda$). For our purposes an ideal family of functions $\mathcal{F}$ would have the following properties. For each public key $k$, there are two functions $ \{f_{k,b}:\sX\rightarrow \sY\}_{b\in\{0,1\}}$ that are both $2$-to-$1$ (i.e. both $f_{k,0}$ and $f_{k,1}$ are injective and their images are equal) and invertible given a suitable trapdoor $t_k$ (i.e. $t_k$ can be used to compute $x$ given $b$ and $y=f_{k,b}(x)$). Furthermore, the pair of functions should be claw free: it must be hard for an attacker to find two points $x_0,x_1\in\sX$ such that $f_{k,0}(x_0) = f_{k,1}(x_1)$. Finally, the functions should satisfy an adaptive hardcore bit property, which is a stronger form of the claw free property: assuming for convenience that $\sX= \{0,1\}^w$, we would like that it is computationally infeasible to simultaneously generate an $x_b\in\sX$ (for some $b\in\{0,1\})$ and a $d\in \{0,1\}^w\setminus \{0^w\}$ such that $d\cdot (x_0\oplus x_1)=0$, where $x_{1-b}$ is defined as the unique element such that $f_{k,1-b}(x_{1-b})=f_{k,b}(x_b)$. 
+
+
+Unfortunately, we do not know how to construct a function family which satisfies all of the requirements above under standard cryptographic assumptions. Nevertheless, we are able to construct a family that satisfies slightly relaxed requirements, that we will show still suffice from our purposes, based on the hardness of the learning with errors problem. The requirements are relaxed as follows. First, the range of the functions is no longer a set $\sY$; instead, it is  $\mathcal{D}_{\sY}$, the set of probability densities over $\sY$. That is, each function returns a distribution, rather than a point. The trapdoor property is described in terms of the support of the output densities, and the $2$-to-$1$ property is formulated in terms of a perfect matching $\mathcal{R}_k$: $f_{k,0}(x_0) = f_{k,1}(x_1)$ if and only if $(x_0,x_1)\in\mathcal{R}_k$. 
+
+The consideration of functions that return distributions gives rise to an additional requirement of efficiency: there should exist a quantum polynomial-time procedure that efficiently prepares a superposition over the range of the function: for any key $k$ and $b\in\{0,1\}$, the procedure can prepare the state
+\begin{equation}\label{eq:perfectsuperposition}
+\frac{1}{\sqrt{\sX}}\sum_{x\in \sX, y\in \sY}\sqrt{f_{k,b}(x)(y)}\ket{x}\ket{y}\;.
+\end{equation}
+In our instantiation based on LWE, it is not possible to prepare~\eqref{eq:perfectsuperposition} perfectly, but it is possible to create a superpsoition with coefficients $\sqrt{f'_{k,b}(x)}$, such that the resulting state is within negligible trace distance of~\eqref{eq:perfectsuperposition}. The density $f'_{k,b}(x)$ is required to satisfy two properties used in our protocol. First, it must be easy to check, without the trapdoor, if an $y\in \sY$ lies in the support of $f'_{k,b,x}$. Second, the inversion algorithm should operate correctly on all $y\in\supp (f'_{k,b}(x_b))$ : for $(x_0,x_1)\in\mathcal{R}_k$, the inversion algorithm must output $x_b$ on input $b,y$.
+
+Our final requirement is the adaptive hardcore bit property. Since the set $\sX$ may not be a subset of binary strings, we first assume the existence of an injective, efficiently invertible map which maps elements in $\sX$ to elements in $\{0,1\}^w$. Next, we only require the adaptive hardcore bit property to hold for a subset of all nonzero strings, instead of the whole set $\{0,1\}^w\setminus \{0^w\}$, as assumed in the ideal description. Finally, membership in the appropriate set should be efficiently checkable, given access to the trapdoor. 
+
+
+
+\begin{definition}\label{def:trapdoorclawfree}
+Let $\lambda$ be the security parameter. Let $\sX$ and $\sY$ be finite sets.
+ Let $\mathcal{K}_{\mathcal{F}}$ be a finite set of keys. A family of functions 
+$$\mathcal{F} \,=\, \big\{f_{k,b} : \sX\rightarrow \mathcal{D}_{\sY} \big\}_{b\in\{0,1\},k\in \mathcal{K}_{\mathcal{F}}}$$
+is called a \textbf{trapdoor claw free (TCF) family} if the following conditions hold:
+
+\begin{enumerate}
+\item{\textbf{Efficient Function Generation.}} There exists an efficient probabilistic algorithm $\textrm{GEN}_{\mathcal{F}}$ which generates a key $k\in \mathcal{K}_{\mathcal{F}}$ together with a trapdoor: 
+$$(k,t_k) \leftarrow \textrm{GEN}_{\mathcal{F}}(1^\lambda)\;.$$
+\item{\textbf{Trapdoor $2$-to-$1$ Functions.}} For all keys $k\in \mathcal{K}_{\mathcal{F}}$ the following conditions hold. 
+\begin{enumerate}
+\item \textit{Trapdoor}: For all $b\in\{0,1\}$ and $x\neq x' \in \sX$, $\supp(f_{k,b}(x))\cap \supp(f_{k,b}(x')) = \emptyset$. Moreover, there exists an efficient deterministic algorithm $\textrm{INV}_{\mathcal{F}}$ such that for all $b\in \{0,1\}$,  $x\in \sX$ and $y\in \supp(f_{k,b}(x))$, $\textrm{INV}_{\mathcal{F}}(t_k,b,y) = x$. 
+\item \textit{$2$-to-$1$}: There exists a perfect matching $\sR_k \subseteq \sX \times \sX$ such that $f_{k,0}(x_0) = f_{k,1}(x_1)$ if and only if $(x_0,x_1)\in \sR_k$. \end{enumerate}
+
+\item{\textbf{Efficient Range Superposition.}}
+For all keys $k\in \mathcal{K}_{\mathcal{F}}$ and $b\in \{0,1\}$ there exists a function $f'_{k,b}:\sX\mapsto \mathcal{D}_{\sY}$ such that
+\begin{enumerate} 
+\item For all $(x_0,x_1)\in \mathcal{R}_k$ and $y\in \supp(f'_{k,b}(x_b))$, INV$_{\mathcal{F}}(t_k,b,y) = x_b$ and INV$_{\mathcal{F}}(t_k,b\oplus 1,y) = x_{b\oplus 1}$. 
+\item There exists an efficient deterministic procedure CHK$_{\mathcal{F}}$ that, on input $k$, $b\in \{0,1\}$, $x\in \sX$ and $y\in \sY$, outputs $1$ if  $y\in \supp(f'_{k,b}(x))$ and $0$ otherwise. Note that CHK$_{\mathcal{F}}$ is not provided the trapdoor $t_k$. 
+\item For every $k$ and $b\in\{0,1\}$, 
+$$ \Es{x\leftarrow_U \sX} \big[\,H^2(f_{k,b}(x),\,f'_{k,b})(x)\,\big] \,\leq\, \mu(\lambda)\;,$$
+ for some negligible function $\mu(\cdot)$. Moreover, there exists an efficient procedure  SAMP$_{\mathcal{F}}$ that on input $k$ and $b\in\{0,1\}$ returns the state
+\begin{equation}
+    \frac{1}{\sqrt{|\sX|}}\sum_{x\in \sX,y\in \sY}\sqrt{(f'_{k,b}(x))(y)}\ket{x}\ket{y}\;.
+\end{equation}
+
+
+\end{enumerate}
+
+
+\item{\textbf{Adaptive Hardcore Bit.}}
+For all keys $k\in \mathcal{K}_{\mathcal{F}}$ the following conditions hold, for some integer $w$ that is a polynomially bounded function of $\lambda$. 
+\begin{enumerate}
+\item For all $b\in \{0,1\}$ and $x\in \sX$, there exists a set $C_{k,b,x}\subseteq \{0,1\}^{w}$ such that $\Pr_{d\leftarrow_U \{0,1\}^w}[d\notin C_{k,b,x}]$ is negligible, and moreover there exists an efficient algorithm that checks for membership in $C_{k,b,x}$ given $k,t_k,b$ and $x$. 
+\item There is an efficiently computable injection $\inj:\sX\to \{0,1\}^w$, such that $\inj$ can be inverted efficiently on its range, and such that if\footnote{Note that although both $x_0$ and $x_1$ are referred to to define the set $H_k$, only one of them, $x_b$, is explictly specified in any $4$-tuple that lies in $H_k$.}
+\begin{eqnarray*}\label{eq:defsetsH}
+H_k &=& \big\{(b,x_b,d,d\cdot(\inj(x_0)\oplus \inj(x_1)))\,|\; b\in \{0,1\},\; (x_0,x_1)\in \mathcal{R}_k,\; d\in C_{k,0,x_0}\cap C_{k,1,x_1}\big\}\;,\\
+\overline{H}_k &=& \{(b,x_b,d,c)\,|\; (b,x,d,c\oplus 1) \in H_k\big\}\;,
+\end{eqnarray*}
+then for all quantum polynomial-time attackers $\mathcal{A}$ there exists a negligible function $\mu(\cdot)$ such that 
+\begin{equation}
+\Big|\Pr_{(k,t_k)\leftarrow \textrm{GEN}_{\mathcal{F}}(1^{\lambda})}[\mathcal{A}(k) \in H_k] - \Pr_{(k,t_k)\leftarrow \textrm{GEN}_{\mathcal{F}}(1^{\lambda})}[\mathcal{A}(k) \in\overline{H}_k]\Big| \,\leq\, \mu(\lambda)\;.
+\end{equation}
+\end{enumerate}
+
+
+
+
+\end{enumerate}
+\end{definition}

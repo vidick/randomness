@@ -1,0 +1,83 @@
+
+
+For a positive real $B$ and positive integers $q$, the truncated discrete Gaussian distribution over $\mZ_q$ with parameter $B$ is supported on $\{x\in\mZ_q:\,\|x\|\leq B\}$ and has density
+\begin{equation}\label{eq:d-bounded-def}
+\forall x \in \mZ_q\;,\qquad D_{\mZ_q,B}(x) \,=\, \frac{e^{\frac{-\pi\lVert x\rVert^2}{B^2}}}{\sum\limits_{x\in\mZ_q,\, \|x\|\leq B}e^{\frac{-\pi\lVert x\rVert^2}{B^2}}} \,1_{\|x\|\leq B}\;.
+\end{equation}
+where the indicator variable $1_{\|x\|\leq B}$ is equal to 1 if $\|x\|\leq B$ and 0 otherwise. We note that for any $B>0$, the truncated and non-truncated distributions have statistical distance that is exponentially small in $B$~\cite[Lemma 1.5]{banaszczyk1993new}. For a positive integer $m$, the truncated discrete Gaussian distribution over $\mZ_q^m$ with parameter $B$ is supported on $\{x\in\mZ_q^m:\,\|x\|\leq B\sqrt{m}\}$ and has density:
+\begin{equation}\label{eq:d-bounded-def-m}
+\forall x = (x_1,\ldots,x_m) \in \mZ_q^m\;,\qquad D_{\mZ_q^m,B}(x) \,=\, D_{\mZ_q,B}(x_1)\cdots D_{\mZ_q,B}(x_m)\;.
+\end{equation}
+We will use the following lemma. 
+
+\begin{lemma}\label{lem:distributiondistance}
+Let $B$ be a positive real number and $q,m$ be positive integers. Let $\*e \in \mZ_q^m$. The Hellinger distance between the distribution $D = D_{\mZ_q^{m},B}$ and the shifted distribution $D+\*e$ satisfies
+\begin{equation}
+H^2(D,D+\*e) \,\leq\, 1- e^{\frac{-2\pi \sqrt{m}\|\*e\|}{B}}\;.
+\end{equation}
+It follows that the statistical distance between the two distributions satisfies
+\begin{equation}
+\big\| D - (D+\*e) \big\|_{TV}^2 \,\leq\, 2\Big(1 - e^{\frac{-2\pi \sqrt{m}\|\*e\|}{B}}\Big)\;.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let $\tau = \sum\limits_{x\in\mZ_q,\, \|x\|\leq B}e^{\frac{-\pi\lVert x\rVert^2}{B^2}}$. We can compute
+\begin{eqnarray*}
+\sum_{\*e_0\in \mZ_q^m} \sqrt{D_{\mZ_q^{m},B}(\*e_0)D_{\mZ_q^{m},B}(\*e_0-\*e)} &=& \sum_{\*e_0\in \mZ_q^m}  \sqrt{D_{B}(\*e)D_{B}(\*e_0-\*e)}\\
+&=& \frac{1}{\tau^m}\sum_{\*e\in \mZ_q^m}e^{\frac{-\pi(\|\*e_0\|^2 + \|\*e_0 - \*e\|^2)}{2B^2}}\\
+&\geq& \frac{1}{\tau^m}\sum_{\*e_0\in \mZ_q^m}e^{\frac{-\pi(\|\*e_0\|^2 + (\|\*e_0\| + \|\*e\|)^2)}{2B^2}}\\
+&=& \frac{1}{\tau^m}\sum_{\*e_0\in \mZ_q^m}e^{\frac{-\pi(\|\*e_0\|^2)}{B^2}}e^{\frac{-\pi(2\|\*e_0\|\|\*e\|)}{2B^2}}e^{\frac{-\pi(\|\*e\|^2)}{2B^2}}\\
+&\geq& e^{\frac{-\pi(\|\*e\|^2 + 2\|\*e_0\|\|\*e\|)}{2B^2}}\frac{1}{\tau^m}\sum_{\*e_0\in \mZ_q^m}e^{\frac{-\pi(\|\*e_0\|)^2}{B^2}}\\
+&=& e^{\frac{-\pi(\|\*e\|^2 + 2\|\*e_0\|\|\*e\|)}{2B^2}}\label{eq:distequality}\\
+&\geq& e^{\frac{-2\pi \|\*e_0\|\|\*e\|}{B^2}}\;.
+\end{eqnarray*}
+Using the fact that for any $\*e_0$ in the support of $D_{\mZ_q^m,B}$, $\|\*e_0\|\leq B\sqrt{m}$, which gives the claimed bound.
+\end{proof}
+
+
+%%%% previous version
+\iffalse
+The learning with errors (LWE) problem was introduced by Regev (\cite{regev2005}).
+
+\tnote{the definition uses different notation from the introductory paragraph at the start of the section}
+\begin{deff}
+For security parameter $\lambda$, let $n\geq 1$ and $q\geq 2$ be integer function of $\lambda$. Let $\chi = \chi(\lambda)$ be a distribution over $\mZ$. The $\lwe_{n,q,\chi}$ problem is to distinguish the following two distributions. In the first distribution, $(\*a_i,m_i)\leftarrow_U \mZ_q^{n}\times \mZ_q$. In the second distribution, one first draws $\*s\leftarrow_U \mZ_q^{n}$; a sample is then obtained by sampling $a_i\leftarrow_U \mZ_q^n$, $e_i\leftarrow \chi$, and returning $(a_i,m_i =  \*a_i\cdot \*s + \*e_i \bmod q)$.
+
+When we write that we make the $\lwe_{n,q,\chi}$ assumption, our assumption is that no $\BQP$ procedure can solve the $\lwe_{n,q,\chi}$ problem with more than a negligible advantage in $\lambda$. 
+\end{deff}
+
+The $\lwe_{n,q,\chi}$ problem is believed to be hard for a wide range of parameter choices. Here we will consider a standard setting where $q$ is a prime power and $\chi$ a $B$-bounded distribution, for some $B$ such that $B = \omega(\sqrt{n}\log n)$. As stated in e.g.~\cite[Corollary 2.1]{brakerski2012}, there exist an efficiently sampleable $\chi$ for which the problem $\lwe_{n,q,\chi}$ with such choice of parameters reduces to a variant of the GapSVP problem that is believed to be hard. 
+
+The learning with errors (LWE) problem was defined by Regev~\cite{regev2005}. In this work we exclusively use the decisional version. The $\lwe_{n,m,q,\chi}$ problem, for $n,m,q\in\bbN$ and for a distribution $\chi$ supported over $\bbZ$ is to distinguish between the distributions $(\mx{A}, \vc{s}\mx{A}+\vc{e} \pmod{q})$ and $(\mx{A}, \vc{u})$, where $\mx{A}$ is uniform in $\bbZ_q^{n \times m}$, $\vc{s}$ is a uniform row vector in $\bbZ_q^n$, $\vc{e}$ is a uniform row vector drawn from $\chi^m$, and $\vc{u}$ is a uniform vector in $\bbZ_q^m$. Often we consider the hardness of solving $\lwe$ for {any} function $m$ (of the security parameter) such that $m$ is at most a polynomial in $n \log q$. This problem is denoted $\lwe_{n,q,\chi}$.
+
+As shown in \cite{regev2005,PRS17}, the $\lwe_{n,q,\chi}$ problem with $\chi$ being the discrete Gaussian distribution with parameter $\sigma = \alpha q \ge 2 \sqrt{n}$ (i.e.\ the distribution over $\bbZ$ where the probability of $x$ is proportional to $e^{-\pi (\abs{x}/\sigma)^2}$, see more details below), is at least as hard as approximating the shortest independent vector problem ($\sivp$) to within a factor of $\gamma = \otild({n}/\alpha)$ in \emph{worst case} dimension $n$ lattices. This is proven using a quantum reduction. Classical reductions (to a slightly different problem) exist as well \cite{Peikert09,BLPRS13} but with somewhat worse parameters. The best known (classical or quantum) algorithm for these problems run in time $2^{\otild(n/\log \gamma)}$. In particular, the problem is conjectured to be intractable for any $\gamma$ such that $\gamma = \poly(n)$.
+\fi
+
+\begin{definition}
+For a security parameter $\lambda$, let $n,m,q\in \bbN$ be integer functions of $\lambda$. Let $\chi = \chi(\lambda)$ be a distribution over $\mZ$. The $\lwe_{n,m,q,\chi}$ problem is to distinguish between the distributions $(\*A, \*A\*s + \*e \pmod{q})$ and $(\*A, \*u)$, where $\*A$ is uniformly random in $\bbZ_q^{n \times m}$, $\*s$ is a uniformly random row vector in $\mZ_q^n$, $\vc{e}$ is a  row vector drawn at random from the distribution $\chi^m$, and $\*u$ is a uniformly random vector in $\mZ_q^m$. Often we consider the hardness of solving $\lwe$ for {any} function $m$ such that $m$ is at most a polynomial in $n \log q$. This problem is denoted $\lwe_{n,q,\chi}$. When we write that we make the $\lwe_{n,q,\chi}$ assumption, our assumption is that no quantum polynomial-time procedure can solve the $\lwe_{n,q,\chi}$ problem with more than a negligible advantage in $\lambda$. 
+\end{definition}
+
+
+
+As shown in \cite{regev2005,PRS17}, the $\lwe_{n,q,D_{\mZ_q,\sigma}}$ problem,  where $D_{\mZ_q,\sigma}$ is the discrete Gaussian distribution with parameter $\sigma = \alpha q \ge 2 \sqrt{n}$, is at least as hard as approximating the shortest independent vector problem ($\sivp$) to within a factor of $\gamma = \otild({n}/\alpha)$ in \emph{worst case} dimension $n$ lattices. This is proven using a quantum reduction. Classical reductions (to a slightly different problem) exist as well \cite{Peikert09,BLPRS13} but with somewhat worse parameters. The best known (classical or quantum) algorithm for these problems run in time $2^{\otild(n/\log \gamma)}$. In this paper, we will be assuming hardness of the problem against a quantum polynomial-time adversary in the case that $\gamma$ is a super polynomial function in $n$. This is a commonly used assumption in cryptographic literature (i.e. in homomorphic encryption schemes such as \cite{fhelwe}).
+
+
+
+
+
+We will use two additional properties of the LWE problem. The first is that it is possible to generate LWE samples $(\*A,\*A\*s+\*e)$ such that there is a trapdoor allowing recovery of $\*s$ from the samples. 
+
+\begin{theorem}[Theorem 5.1 in~\cite{miccancio2012}]\label{thm:trapdoor}
+Let $n,m\geq 1$ and $q\geq 2$ such that $m = \Omega(n\log q)$. There is an efficient randomized algorithm $\GenTrap(1^n,1^m,q)$ that outputs a matrix $\*A \in \mZ_q^{m\times n}$ and a trapdoor $t_{\*A}$ such that the distribution of $\*A$ is negligibly (in $n$) close to the uniform distribution. Moreover, there is an efficient algorithm $\Invert$ which, on input $\*A, t_{\*A}$ and $\*A\*s+\*e$ where $\|\*e\| \leq q/(C_T\sqrt{n\log q})$ and $C_T$ is a universal constant, returns $\*s$ and $\*e$ with overwhelming probability over $(\*A,t_{\*A})\leftarrow $GenTrap. \end{theorem}
+
+The second property we will use is the existence of a ``lossy mode'' for LWE. The following definition is Definition~3.1 in~\cite{lwr}. 
+
+\begin{definition}\label{def:lossy}
+Let $\chi = \chi(\lambda)$ be an efficiently sampleable distribution over $\mZ_q$. Define a lossy sampler $\tilde{\*A} \leftarrow \lossy(1^n,1^m,1^\ell,q,\chi)$ by  $\tilde{\*A} = \*B\*C +\*F$, where $\*B\leftarrow_U \mZ_q^{m\times \ell}$, $\*C\leftarrow_U \mZ_q^{\ell \times n}$, $\*F\leftarrow \chi^{m\times n}$. 
+\end{definition}
+
+\begin{theorem}[Lemma 3.2 in~\cite{lwr}]\label{thm:lossy}
+Under the $\lwe_{\ell,q,\chi}$ assumption, the distribution of $\tilde{\*A} \leftarrow \lossy(1^n,1^m,1^\ell,q,\chi)$ is computationally indistinguishable from $\*A\leftarrow_U \mZ_q^{m\times n}$. 
+\end{theorem}
+

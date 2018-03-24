@@ -47,14 +47,14 @@ $$ \Es{x\leftarrow_U \sX} \big[\,H^2(f_{k,b}(x),\,f'_{k,b})(x)\,\big] \,\leq\, \
 \item{\textbf{Adaptive Hardcore Bit.}}
 For all keys $k\in \mathcal{K}_{\mathcal{F}}$ the following conditions hold, for some integer $w$ that is a polynomially bounded function of $\lambda$. 
 \begin{enumerate}
-\item For all $b\in \{0,1\}$ and $x\in \sX$, there exists a set $C_{k,b,x}\subseteq \{0,1\}^{w}$ such that $\Pr_{d\leftarrow_U \{0,1\}^w}[d\notin C_{k,b,x}]$ is negligible, and moreover there exists an efficient algorithm that checks for membership in $C_{k,b,x}$ given $k,t_k,b$ and $x$. 
-\item There is an efficiently computable injection $\inj:\sX\to \{0,1\}^w$, such that $\inj$ can be inverted efficiently on its range, and such that if\footnote{Note that although both $x_0$ and $x_1$ are referred to to define the set $H_k$, only one of them, $x_b$, is explictly specified in any $4$-tuple that lies in $H_k$.}
+\item For all $b\in \{0,1\}$ and $x\in \sX$, there exists a set $D_{k,b,x}\subseteq \{0,1\}^{w}$ such that $\Pr_{d\leftarrow_U \{0,1\}^w}[d\notin D_{k,b,x}]$ is negligible, and moreover there exists an efficient algorithm that checks for membership in $D_{k,b,x}$ given $k,t_k,b$ and $x$. 
+\item There is an efficiently computable injection $\inj:\sX\to \{0,1\}^w$, such that $\inj$ can be inverted efficiently on its range, and such that the following holds. For $y\in \mY$, let $\hat{D}_y = D_{k,0,x_0}\cap D_{k,1,x_1}$, where for $b\in\{0,1\}$, $x_b$ is such that $F_{k,b}(x_b)=y$. Then\footnote{Note that although both $x_0$ and $x_1$ are referred to to define the set $H_k$, only one of them, $x_b$, is explictly specified in any $4$-tuple that lies in $H_k$.}
 \begin{eqnarray*}\label{eq:defsetsH}
-H_k &=& \big\{(b,x_b,d,d\cdot(\inj(x_0)\oplus \inj(x_1)))\,|\; b\in \{0,1\},\; (x_0,x_1)\in \mathcal{R}_k,\; d\in C_{k,0,x_0}\cap C_{k,1,x_1}\big\}\;,\\
+H_k &=& \big\{(b,x_b,d,d\cdot(\inj(x_0)\oplus \inj(x_1)))\,|\; b\in \{0,1\},\; (x_0,x_1)\in \mathcal{R}_k,\; d\in \hat{D}_y\big\}\;,\\
 \overline{H}_k &=& \{(b,x_b,d,c)\,|\; (b,x,d,c\oplus 1) \in H_k\big\}\;,
 \end{eqnarray*}
 then for all quantum polynomial-time attackers $\mathcal{A}$ there exists a negligible function $\mu(\cdot)$ such that 
-\begin{equation}
+\begin{equation}\label{eq:adaptive-hardcore}
 \Big|\Pr_{(k,t_k)\leftarrow \textrm{GEN}_{\mathcal{F}}(1^{\lambda})}[\mathcal{A}(k) \in H_k] - \Pr_{(k,t_k)\leftarrow \textrm{GEN}_{\mathcal{F}}(1^{\lambda})}[\mathcal{A}(k) \in\overline{H}_k]\Big| \,\leq\, \mu(\lambda)\;.
 \end{equation}
 \end{enumerate}

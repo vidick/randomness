@@ -129,75 +129,80 @@
 \begin{document}
 
 \title{Information-theoretic randomness from computational assumptions}
-\author{}
+\author{Zvika Brakerski \and Urmila Mahadev \and Umesh Vazirani \and Thomas Vidick}
 \date{}
 \maketitle
 
 \noteswarning
 
+\begin{abstract}\tnote{first try, rough:}
+The study of quantum non-locality and Bell inequalities has in recent years led to efficient protocols for a classical verifier to achieve tasks that range from certifiable randomness expansion to device-independent quantum key distribution and verifiable delegation of quantum computation. These feats rely on the assumption that the verifier has access to two non-communicating but entangled quantum devices. 
+
+While large-scale Bell tests remain a distant experimental challenge, medium-scale quantum devices are being thoroughly investigated. We revisit the arguably simplest and most fundamental of these tasks, randomness certification, in this context. We give a protocol that achieves information-theoretic randomness certification by interacting with a single quantum device; the guarantee requires that the quantum device is polynomial-time bounded during the protocol but holds against any quantum third party, that may share quantum entanglement with the device and may not be computationally bounded. 
+
+Our protocol is based on a new cryptographic primitive called a trapdoor claw-free Function family, for which we give an instantiation based on the learning with errors problem. We discuss applications to testing quantum devices and to quantum supremacy experiments. 
+\end{abstract}
 
 \section{Introduction}
 
-In this paper we propose a solution to a basic task: how to generate certifiably random numbers (bit sequences) from a single untrusted quantum device. The setting we 
-consider is one where the quantum device is polynomial time bounded but untrusted, the verifier is classical (and also polynomial time bounded), and the classical 
-verifier can leverage post-quantum cryptography --- cryptographic primitives which can be implemented efficiently on a classical computer, but which cannot be broken
-by any efficient quantum computer. 
-There has been considerable research into certifiable quantum random generation~\cite{}. However, it has focused on the setting where there are multiple quantum devices
-that share entanglement, and where the randomness certification relies crucially on violation of Bell inequalities. By contrast, in the setting that we study, there is a single polynomial 
-time bounded quantum device, and the guarantee we seek is that if the device is unable to break the post-quantum cryptographic assumption during the execution of the protocol, then the output 
-must be statistically random. Note that this information-theoretic guarantee is much stronger than the computational pseudo-randomness that would follow from using a pseudo-random generator, a task that is easily achievable under standard cryptographic assumptions. 
+In this paper we propose a solution to the following basic task: how to generate \emph{certifiably random} numbers (sequences of bits) from a \emph{single untrusted} quantum device. The setting we consider is one where the quantum device is polynomial-time bounded but untrusted, and the verifier is entirely classical, also polynomial-time bounded, and can leverage post-quantum cryptography, i.e. cryptographic primitives that can be implemented efficiently on a classical computer, but that cannot be broken by any efficient quantum computer. 
+There has been considerable research into certifiable quantum random number generation~\cite{Colbeck09,Pironio,FGS11,PM11,VV12,miller2016robust,bierhorst2018experimentally}. However, all prior works providing verifiable guarantees have focused on the setting where there are multiple quantum devices
+that share entanglement, and where the randomness certification relies crucially on violation of Bell inequalities. By contrast, in the setting that we study there is a single polynomial-time bounded quantum device, and the guarantee we seek is that if the device is unable to break the post-quantum cryptographic assumption during the execution of the protocol, then the output 
+of the protocol must be statistically random. Note that this information-theoretic guarantee is much stronger than the computational pseudo-randomness that would follow from using a pseudo-random generator, a task that is easily achievable under standard cryptographic assumptions. It is the same guarantee as that offered in the aforementioned works; the difference is that, instead of relying on spatial isolation of two quantum devices during the protocol, we rely on the computational boundedness of a single quantum device during the protocol. 
 
-The basic idea underlying our protocol is very simple, and relies on the existence of a (post-quantum secure) trapdoor collision-resistant family of hash function (in short, TCF) $f:\{0,1\}^n \rightarrow \{0,1\}^m$.
-A TCF is a 2-to-1 function, which satisfies the following properties: $f(x)$ is efficiently computable on a classical computer, and if $f(x) = y$, then there is a unique 
-$x' \neq x$ such that $ f(x') = y$. Moreover with knowledge of a secret trapdoor key it is possible to efficiently (classically) compute $x$ and $x'$ from $y$, but without the secret key there is no efficient 
-quantum algorithm that can compute such a triple $x, x', y$, for any $y$. 
+The basic idea underlying our protocol is simple, and relies on the existence of a (post-quantum secure) trapdoor collision-resistant family of hash function (in short, TCF) $f:\{0,1\}^n \rightarrow \{0,1\}^m$.
+A TCF is a $2$-to-$1$ function $f$ that satisfies the following properties: $f(x)$ is efficiently computable on a classical computer, and if $f(x) = y$, then there is a unique 
+$x' \neq x$ such that $ f(x') = y$. Moreover, with knowledge of a secret trapdoor  it is possible to efficiently (classically) compute $x$ and $x'$ from $y$, but without the trapdoor there is no efficient 
+quantum algorithm that can compute such a triple $(x, x', y)$, for any $y$. 
+Our approach to certifiable random number generation is built on the following two observations. First, there is an efficient quantum algorithm that 
+computes $y$ in the image of $f$, as well as a binary vector $d$ such that  $d\cdot(x + x') = 0$, i.e. a single bit of information that is simultaneously about the two preimages of $y$. To achieve this, the quantum algorithm simply evaluates the function $f$ in superposition over all inputs, measures an image $y$ to prepare $\frac{1}{\sqrt{2}}(\ket{x}+\ket{x'})$, and finally performs a Fourier transform and measures to obtain $d$. In contrast, we 
+believe that for generic TCFs no efficient classical procedure should be able to generate such an equation with non-negligible advantage. Second, the pair $(y, d)$ produced by the quantum 
+algorithm is random --- $y$ is a random element in the image of $f$, and $d$ is a uniformly random $n$-bit string conditioned on $d\cdot(x + x') = 0$.
 
-Our approach to certifiable random number generator is built on two observations: a) There is a simple quantum algorithm that 
-computes $y$ in the image of $f$ and $d: d\cdot(x + x') = 0$. i.e. a bit of joint information about the two preimages of $y$. We 
-believe that this is a task that is computationally hard for any classical computer b) The $y, d$ pair  produced by the quantum 
-algorithm is random --- $y$ is a random element of the image and $d$ is a random n-bit string satisfying $d: d\cdot(x + x') = 0$.
-The quantum algorithm is the following: 1) efficiently evaluate $f$ in superposition to prepare the state $2^{-n/2}\sum_x \ket{x}\ket{f(x)}$. 2) measure the second register to obtain a random element $y$ in the range of $f$, leaving the first register 
-is in the state $1/\sqrt{2}\ket{x} + 1/\sqrt{2}\ket{x'}$. 3) Fourier sample on the first register (Hadamard transform followed by a measurement) to obtain a random n-bit string 
-$d: d\cdot(x + x') = 0$.
+%The quantum algorithm is the following: 1) efficiently evaluate $f$ in superposition to prepare the state $2^{-n/2}\sum_x \ket{x}\ket{f(x)}$. 2) measure the second register to obtain a random element $y$ in the range of $f$, leaving the first register is in the state $1/\sqrt{2}\ket{x} + 1/\sqrt{2}\ket{x'}$. 3) Fourier sample on the first register (Hadamard transform followed by a measurement) to obtain a random n-bit string $d: d\cdot(x + x') = 0$.
 
-Of course the classical verifier cannot access the inner workings of the quantum device, and from her viewpoint the device is a black box that outputs $y$ and $d$. However, since she knows the secret trapdoor key, she can verify the condition that $d$ satisfies $d\cdot(x + x') = 0$. 
-Our strongest conjecture is that if this test is passed with probability significantly higher than $1/2$ then the pair $y,d$ must have 
-high min-entropy. i.e. if any efficient quantum algorithm outputs $y, d$, satisfying the condition $d: d\cdot(x + x') = 0$, then the pair $y,d$ must have high min-entropy.
-While we do not know how to prove such a strong statement, we can prove that there is a 
-protocol based on any TCF
-that succeeds in certifiable randomness expansion from a single untrusted quantum (polynomial time) device. Specific TCFs 
-satisfy additional properties, and for these our protocol uses $\poly\log(N)$ bits of the randomness for the verifier, to 
-generate $O(N)$ bits that are statistically within negligible distance from uniform. The actual computational building block 
-for our certifiable random number generator is a small variant of the one described above. 
+Of course the classical verifier cannot access the inner workings of the quantum device, and from her viewpoint the device is a black box that outputs $y$ and $d$. However, since she knows the secret trapdoor key, she can verify that $d$ satisfies the equation  $d\cdot(x + x') = 0$. 
+One might now conjecture that for a generic TCF if the output of any efficient quantum device passes this test with non-negligible advantage over $\frac{1}{2}$ then the pair $y,d$ must have high min-entropy. Such a strong statement would immediately yield a randomness certification protocol. 
+While we do not know how to prove this, we are still able to design and analyze a simple protocol, that can be based on any TCF family and succeeds in certifiable randomness expansion from a single untrusted quantum (polynomial-time) device. Security of the protocol rests on an appropriate cryptographic assumption on the TCF for which we give a candidate construction under the sub-exponential LWE assumption. 
 
-The computational heart of this protocol is the following: the device outputs $y$ in the range of $f$. The classical verifier then issues one of 
-two challenges $0$ (preimage) or $1$ (equation). The prover responds by providing a preimage of $y$ or  $d: d\cdot(x + x') = 0$ respectively. 
-The correctness of our protocol is built upon the claim that if an efficient quantum algorithm can generate a valid equation with probability close to $1$, then it must generate a random pre-image.
+Our certifiable random number generator is a small variant of the one described above. 
+The computational heart of the protocol is the following. The device is first required to output an element $y$ in the range of $f$. The classical verifier then issues one of 
+two challenges,  $C=0$ (``equation'') or $C=1$ (``pre-image''). The device responds by providing either a $d$ such that $d\cdot(x + x') = 0$,\footnote{The exact condition for the equation is slightly more complicated, due to the formal definition of a TCF; see Section~\ref{sec:protocol} for a complete description of the protocol.} or a valid pre-image for $y$. 
+The correctness of our protocol is built upon the claim that if an efficient quantum algorithm has the ability to generate a valid equation with high enough probability close to $1$, then, if instead it is asked for a pre-image, this pre-image must be close to uniformly distributed over the two possibilities. Therefore, our protocol repeatedly asks for pre-images (to generate randomness), while inserting a few randomly located ``equation'' challenges, to test the device. 
 
-Besides its inherent interest, another motivation for our study of certifiable random number generation is the belief that this is quite fundamental to the important area 
-of the testing of quantum devices. Indeed, the idea of constraining a quantum polynomial-time prover to being in a superposition of one of two n-bit strings $x$ or $x'$ via TCFs have since played a key role in the breakthrough result giving the first fully quantum homomorphic encryption scheme~\cite{}. This was the first such protocol where the client is classical; even allowing for a quantum client, it was also the first protocol where the size of the computation performed locally by the client is asymptotically smaller than the size of the computation to be performed on the encrypted input. The main construction used a
+A formal analysis of the protocol requires showing that the sequence
+that the verifier extracts from the device's answers to ``pre-image'' challenges must look statistically random even to an 
+infinitely powerful quantum adversary, who may share an arbitrary entangled state with
+the quantum device. The difficulty here is that while the assumption of post-quantum security of the TCF constrains the responses of the polynomial-time quantum device during the
+protocol, the adversary is not assumed computationally bounded, and can in principle completely break any cryptographic assumptions. In terms of efficiency, 
+for specific TCFs with additional properties, our protocol uses $\poly\log(N)$ bits of randomness to 
+generate $O(N)$ bits that are statistically within negligible distance from uniform. 
+
+
+Besides its inherent interest, another motivation for our study is the belief that  certifiable random number generation  is quite fundamental to the important area 
+of testing of quantum devices. Indeed, the idea of constraining a quantum polynomial-time prover to being in a superposition of one of two $n$-bit strings $x$ or $x'$ via TCFs has since played a key role in a result giving the first fully quantum homomorphic encryption scheme~\cite{mahadev2017classical}. This was the first such protocol where the client is classical; even allowing for a quantum client, it was also the first protocol where the size of the computation performed locally by the client is asymptotically smaller than the size of the computation to be performed on the encrypted input. (Prior works on quantum homomorphic encryption were either limited in the type of computation they could allow~\cite{broadbent2015quantum}, or required the use of quantum keys~\cite{dulek2016quantum}.) The main construction in~\cite{mahadev2017classical} relies on a
 suitably modified TCF to enable the quantum server to apply a controlled CNOT gate on quantum data, where the control qubit is encrypted. The paper also 
-introduced a particularly efficient implementation of a TCFs, based on LWE. For certifiable random number generation, an LWE based TCF
-leads to much better parameters, and so for most of the paper we will assume that the TCF has these additional properties.\footnote{The definition of a TCF given in the introduction is informal; our instantiation of a TCF based on the LWE problem requires a slightly more complex definition. See Section~\ref{} for details.} 
+introduced a particularly efficient implementation of a TCF family, based on the Learning with Errors problem (LWE). In this paper we use a similar construction, also based on the LWE problem. 
  
 One of the important questions in the area of testing quantum devices is establishing quantum supremacy --- a proof that a quantum computing device performs some 
 computational task that cannot be solved classical without impractical resources. The current approach to doing so is to identify sampling tasks that can be performed with
-a $50-60$ qubit device together with (computational complexity-based) evidence that no efficient classical algorithm can sample from the same (or close) distribution. %The point here is that $50-60$ qubits is small enough that a supercomputer can simulate the ideal quantum device, thereby facilitating some kind of classical test verifying that the output of the quantum device faithfully behaved close to
-The main remaining challenge lies in testing that the quantum device actually sampled from the desired probability distribution. The advantage of the $50-60$ qubit limit is that it is sufficiently small that a supercomputer can simulate the quantum device to actually compute the ideal probability of any particular output string. This still leaves a major problem --- the number of samples from the quantum device is necessarily quite small, and this imposes severe restrictions to how well the probability distribution output by the quantum device can be characterized. Aside from this issue,
-ideally we would like to perform quantum supremacy experiments on quantum devices with larger number of qubits --- indeed, 
-this may even be necessary for establishing basic supremacy, since there are improved classical algorithms for the computational tasks underlying the current quantum supremacy proposals~\cite{}. Our task of generating certifiable randomness gets around these limits, since the verification that the task has been performed takes time polynomial in the number of qubits. Indeed, for the purposes of quantum supremacy, it suffices to focus on the core computational task: the device outputs $y$ in the range of $f$ and is then challenged to produce a preimage 
-or equation. We can then appeal to one of the features of LWE based cryptography, namely the possibility of proving very strong hard core bit properties via a technique called lossy cryptography. Specifically for the computational task above, we can show using lossy techniques together with Fourier analysis that the bit $d\cdot(x + x')$ is a hardcore bit. i.e. no polynomial time quantum algorithm 
-can output $(x, y, d, d\cdot(x + x'))$ with probability significantly better than $1/2$. Note that classical verification for this computational task
-scales polynomially. Moreover, even plugging directly into existing LWE schemes this would already provide a feasible implementation with $50$ bits of security(?) at around $2000$ qubits. It would therefore be worth exploring whether there are clever implementations of this scheme 
-that can lead to a quantum supremacy protocol in the 200-500 qubit range. 
+a $50-60$ qubit device together with (computational complexity-based) evidence that no efficient classical algorithm can sample from the same (or close) distribution (see e.g.~\cite{harrow2017quantum} for a recent survey). The main remaining challenge lies in testing that the quantum device actually sampled from the desired probability distribution. The advantage of the $50-60$ qubit limit is that it is sufficiently small that a supercomputer can simulate the quantum device to actually compute the ideal probability of any particular output string. This still leaves a major problem --- the number of samples from the quantum device is necessarily quite small, and this imposes severe restrictions to how well the probability distribution output by the quantum device can be characterized. Aside from this issue,
+ideally we would like to perform quantum supremacy experiments on quantum devices with larger number of qubits --- 
+%indeed, current quantum supremacy proposals are already being pushed to larger numbers of qubits with improvements in classical algorithms
+this may even be necessary for establishing basic supremacy, since there are improved classical algorithms for the computational tasks underlying the current quantum supremacy proposals~\cite{pednault2017breaking,clifford2018classical}. Our task of generating certifiable randomness gets around these limits, since the verification that the task has been performed takes time polynomial in the number of qubits. Indeed, for the purposes of quantum supremacy, it suffices to focus on the core computational task in our randomness protocol: the device outputs $y$ in the range of $f$ and is then challenged to produce either a pre-image $x$ or an equation $d$ such that  $d\cdot(x + x') = 0$. Note that classical verification for this computational task
+scales polynomially. To establish classical hardness, we can then appeal to one of the features of LWE-based cryptography, namely the possibility of proving very strong hardcore bit properties via a technique called lossy cryptography. Specifically for the computational task above, we can show using lossy techniques together with Fourier analysis that the bit $d\cdot(x + x')$ is a hardcore bit. i.e. no polynomial time (quantum) algorithm 
+can simultaneously output a tuple $(x, y, d, m)$ such that $m=d\cdot(x + x')$ with probability non-negligibly larger than $\frac{1}{2}$. This immediately implies that there cannot be any efficient classical algorithm that can reliably answer a random 
+challenge, ``pre-image'' or ``equation'', as such an algorithm could be ``rewinded'' to simultaneously answer both challenges. In contrast, a quantum device cannot generally be rewinded in such a way --- as long as it generates unpredictable outcomes! This proposal for quantum supremacy seems quite practical - indeed, using off-the-shelf bounds for  LWE-based cryptography suggests that a protocol providing $50$ bits of security could be implemented with a quantum device of around $2000$ qubits (see e.g.~\cite{lindner2011better}). It would therefore be worth exploring whether there are clever implementations of this scheme 
+that can lead to a quantum supremacy protocol in the $200-500$ qubit range. Our protocol is robust to a device that only successfully answers the verifier's challenges a sufficiently large, but constant, fraction of the time; it would be interesting to explore whether such a device could be implemented without resorting to general fault-tolerance techniques. 
 
-Another setting within which these ideas can be naturally explored is by modeling a TCF by a random 2-1 function $f$, specified via a black 
-box which can only be accessed by (quantum) queries. We conjecture that any efficient quantum 
-algorithm that outputs $d: d\cdot(x + x') = 0$ for $f(x) = f(x') = y$ with small min entropy must have super-polynomial query complexity. 
-Of course it is possible to formulate many related conjectures, such as the entropy of $(d, y)$ must be at least $n - O(\log n)$ for any 
-polynomial time query complexity algorithm. These conjectures appear to have a quite distinct nature than those studied in the 
+One natural way to model a TCF family is as a random $2$-to-$1$ function $f$, specified via a black box which can only be accessed by (quantum) queries.
+%Another setting within which these ideas can be naturally explored is by modeling a TCF by a random 2-1 function $f$, specified via a black box which can only be accessed by (quantum) queries. 
+We conjecture that any efficient quantum 
+algorithm that outputs a $d$ such that $ d\cdot(x + x') = 0$, where $x,x'$ are such that $f(x) = f(x')$, and such that $d$ has small min entropy, must have super-polynomial query complexity. 
+It is possible to formulate many related conjectures, such as that the entropy of $(d, y)$ must be at least $n - O(\log n)$ for any 
+polynomial-time query complexity algorithm. These conjectures appear to have a quite distinct nature from those studied in the 
 extensive literature on quantum query complexity. In particular, we do not know how to use 
-any of the existing query complexity lowerbound techniques to prove such bounds, and this poses an interesting new challenge to 
+any of the existing query complexity lower-bound techniques to prove such bounds;  this poses an interesting new challenge to 
 the area of quantum query complexity. 
 
 \subsection*{Outline of randomness generation protocol + proof}
@@ -213,7 +218,7 @@ $\poly\log(N)$ random bits. On each of the remaining $N - \poly\log(N)$ rounds t
 whether the device returns the preimage $x$, or $x'$ (e.g. recording $0$ for the lexicographically smaller preimage). At the end of the protocol the verifier
 uses a strong quantum-proof randomness extractor to extract $\Omega(N)$ bits of randomness from the recorded string. 
 
-To guarantee that the extractor produces bits that are statistically close to uniform we would like to prove that the $N - \poly\log(N)$ random bits recorded by the verifier must have  $\Omega(N)$ bits of (smoothed) min-entropy,\footnote{We refer to Section~\ref{} for definitions of entropic quantities.} even conditioned on the side information available to of an infinitely powerful quantum adversary, who may share an arbitrary entangled state with
+To guarantee that the extractor produces bits that are statistically close to uniform we would like to prove that the $N - \poly\log(N)$ random bits recorded by the verifier must have  $\Omega(N)$ bits of (smoothed) min-entropy,\footnote{We refer to Section~\ref{sec:prelim} for definitions of entropic quantities.} even conditioned on the side information available to of an infinitely powerful quantum adversary, who may share an arbitrary entangled state with
 the quantum device. The difficulty here is that while the assumption of  post-quantum security of the TCF constrains the responses of any polynomial-time quantum device during the
 protocol, the adversary is not assumed computationally bounded, and can in principle completely break any cryptographic assumptions. This includes recovering the trapdoor information from the publicly disclosed key chosen by the verifier at the first step of the protocol. Nevertheless, we aim to prove that the adversary cannot obtain any information, at any time, about the randomness extracted by the verifier at the end of the protocol. 
 
@@ -239,8 +244,8 @@ exactly $\pi/4$. The previous argument shows that this induces only a negligible
 an uncertainty principle from~\cite{miller2014universal} to show that each such measurement increases the conditional R\'enyi entropy of the output register by a small additive constant. Pursuing this approach across all $N$ rounds, we obtain a linear lower bound on the conditional R\'enyi entropy of the output register, conditioned on the  state of the device. Argued above this in turn translates into a linear lower bound on the smooth conditional min-entropy of the output, conditioned on the state of the adversary and the verifier's choice of challenges. It only remains to apply a quantum-proof randomness extractor to the output, using a poly-logarithmic number of additional bits of randomness, to obtain the final result. 
 
 
-
 \section{Preliminaries}
+\label{sec:prelim}
 
 \subsection{Notation}
 
@@ -336,7 +341,7 @@ $$ \Hmin^\delta(X|E)_\rho \,\geq\, -\frac{1}{\eps} \log \Big( \sum_x \langle \si
 
 
 %==============================%
-\section{Trapdoor Claw-free hash functions}
+\section{Trapdoor claw-free hash functions}
 \label{sec:tcf}
 %==============================%
 
@@ -359,7 +364,11 @@ Our randomness expansion protocol, Protocol~1, is described in Figure~\ref{fig:p
 
 At the start of the protocol, the verifier executes $(k,t_k)\leftarrow \Gen_\mF(1^\lambda)$ to obtain the public key $k$ and trapdoor $t_k$ for a pair of functions $\{f_{k,b}:\mX\to \mD_\mY\}$ from the TCF family, and sends the key $k$ to the prover, keeping the associated trapdoor private. 
 
-In each of the $N$ rounds of the protocol, the prover is first required to provide a value $y\in\mY$. The verifier then chooses a round type $G\in\{0,1\}$ according to a biased distribution: either a \emph{test round}, $G=0$, chosen with probability $\Pr(G=0)=\frac{q}{2}$, or a \emph{generation round}, $G=1$, chosen with the remaining probability $\Pr(G=1)=1-\frac{q}{2}$. The former type of round is less frequent, as the parameter $q$ will eventually be set to a very small value, that goes to $0$ with the number of rounds of the protocol. Note the prover is not told the round type. 
+In each of the $N$ rounds of the protocol, the prover is first required to provide a value $y\in\mY$. For $b\in\{0,1\}$, the verifier then uses the trapdoor to compute $\hat{x}_b\leftarrow \Inv_\mF(t_k,b,y)$. (If the inversion procedure fails, the verifier requests another sample from the prover.) For convenience, introduce a set 
+\begin{equation}\label{eq:def-gy}
+ \hat{\dset}_y \,=\, \dset_{k,0,x_0} \cap \dset_{k,1,x_1}\;.
+\end{equation}
+The verifier then chooses a round type $G\in\{0,1\}$ according to a biased distribution: either a \emph{test round}, $G=0$, chosen with probability $\Pr(G=0)=\frac{q}{2}$, or a \emph{generation round}, $G=1$, chosen with the remaining probability $\Pr(G=1)=1-\frac{q}{2}$. The former type of round is less frequent, as the parameter $q$ will eventually be set to a very small value, that goes to $0$ with the number of rounds of the protocol. Note the prover is not told the round type. 
 
 Depending on the round type, the verifier chooses a challenge $C\in\{0,1\}$ that she sends to the prover. In the case of a test round the challenge is chosen uniformly at random; in the case of a generation round the challenge is always $C=1$. In case $C=0$ the prover is asked to return a pair $(m,d)\in \{0,1\}\times\{0,1\}^w$. The answer is called valid if $m=d\cdot(\inj(x_0)\oplus \inj(x_1))$ and $d\in\hat{\dset}_{y}$, where $x_0$ and $x_1$ are such that $f_{k,b}(x_b)=y$ for $b\in \{0,1\}$. Note that the verifier is able to compute $x_0$ and $x_1$ from $y$ using the trapdoor $t_k$. If $d\in\hat{\dset}_y$, the verifier sets a decision bit $W=1$ if the answer is valid, and $W=0$ if not. If $d\notin \hat{\dset}_y$, the verifier sets the decision bit $W\in\{0,1\}$ uniformly at random.\footnote{This choice if made for technical reasons that have to do with the definition of the adaptive hardcore bit property; see Section~\ref{sec:soundness} and the proof of Proposition~\ref{sec:soundness} for details.}
 In case $C=1$, the prover should return  a pair $(b,x)\in \{0,1\}\times\mX$. The answer is called valid if $f_{k,b}(x)=y$. The set of valid answers on challenge $C=c\in\{0,1\}$ is denoted $V_{y,c}$. The verifier sets a decision bit $W=1$ in case the answer is valid, and $W=0$ otherwise. 
@@ -376,7 +385,7 @@ Let $\lambda$ be a security parameter. Let $N$ be a polynomially bounded functio
 \item The prover returns a  $y \in \mY$ to the verifier. For $b\in\{0,1\}$ the verifier uses the trapdoor to compute $\hat{x}_b\leftarrow \Inv_\mF(t_k,b,y)$. 
 \item The verifier selects a round type $G_i \in \{0,1\}$ according to a Bernoulli  distribution with parameter $\frac{q}{2}$: $\Pr(G_i=0)=\frac{q}{2}$ and $\Pr(G_i=1)=1-\frac{q}{2}$. In case $G_i=0$ (\emph{test round}), she chooses a challenge $C_i\in \{0,1\}$ uniformly at random. In case $G_i=1$ (\emph{generation round}), she sets $C_i=1$. The verifier keeps $G_i$ private, and sends $C_i$ to the prover. 
 \begin{enumerate}
-\item In case $C_i=0$ the prover returns $(m,d)\in\{0,1\}\times \{0,1\}^w$. If $d\notin \hat{\dset}_y$ the verifier sets $W$ to a uniformly random bit. Otherwise, the verifier sets $W=1$ if $d\cdot (\inj(\hat{x}_0)\oplus \inj(\hat{x}_1)) = m$ and $W=0$ if not.
+\item In case $C_i=0$ the prover returns $(m,d)\in\{0,1\}\times \{0,1\}^w$. If $d\notin \hat{\dset}_y$, the set defined in~\eqref{eq:def-gy} the verifier sets $W$ to a uniformly random bit. Otherwise, the verifier sets $W=1$ if $d\cdot (\inj(\hat{x}_0)\oplus \inj(\hat{x}_1)) = m$ and $W=0$ if not.
 \item In case $C_i=1$ the prover returns $(b,x)\in\{0,1\}\times \mX$. The verifier sets $W=1$ if $x = \hat{x}_b$, and $W=0$ otherwise. 
 \end{enumerate}
 \item In case $G_i=1$, the verifier sets $O_i = b$. In case $G_i=0$, she sets $W_i = W$. 

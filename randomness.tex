@@ -151,7 +151,7 @@ There has been considerable research into certifiable quantum random number gene
 that share entanglement, and where the randomness certification relies crucially on the violation of a Bell inequality. By contrast, in the setting that we study there is a single polynomial-time bounded quantum device, and the guarantee we seek is that provided the device is unable to break the post-quantum cryptographic assumption during the execution of the protocol, then the output 
 of the protocol must be statistically indistinguishable from a uniformly random sequence of bits, to any computationally unbounded adversary that may share prior entanglement with the computationally bounded device. This information-theoretic guarantee, the same guarantee as that offered in the aforementioned works, is much stronger than the computational pseudo-randomness that would follow from using a pseudo-random generator (a task that is easily achievable under standard cryptographic assumptions). %It is the same guarantee as that offered in the aforementioned works; the difference is that, instead of relying on spatial isolation of two quantum devices during the protocol, we rely on the computational boundedness of a single quantum device during the protocol. 
 
-The basic idea underlying our protocol is simple, and relies on the existence of a (post-quantum secure) family of trapdoor collision-resistant hash function (in short, TCF) $f:\{0,1\}^n \rightarrow \{0,1\}^m$.
+The basic idea underlying our protocol is simple, and relies on the existence of a (post-quantum secure) trapdoor claw-free family (in short, TCF) of functions $f:\{0,1\}^n \rightarrow \{0,1\}^m$.
 A TCF is a $2$-to-$1$ function $f$ that satisfies the following properties:\footnote{The exact definition is slightly more complicated. See Section~\ref{sec:tcf}.} $f(x)$ is efficiently computable on a classical computer, and if $f(x) = y$, then there is a unique 
 $x' \neq x$ such that $ f(x') = y$. Moreover, with knowledge of a secret trapdoor  it is possible to efficiently (classically) compute $x$ and $x'$ from $y$, but without the trapdoor there is no efficient 
 quantum algorithm that can compute such a triple $(x, x', y)$, for any $y$.
@@ -278,7 +278,7 @@ the area of quantum query complexity.
 \subsection{Notation}
 
 $\N$ is the set of natural numbers. 
-For all $q \in \bbN$ we let $\bbZ_q$ denote the ring of integers modulo $q$. We represent elements in $\bbZ_q$ using numbers in the range $(-\tfrac{q}{2}, \tfrac{q}{2}] \cap \bbZ$. We denote by $\trnq{x}$ the unique integer $y$ s.t.\ $y = x \pmod{q}$ and $y \in (-\frac{q}{2}, \frac{q}{2}]$. For $x\in\bbZ_q$ we define $\abs{x}=|{\trnq{x}}|$.
+For all $q \in \bbN$ we let $\bbZ_q$ denote the ring of integers modulo $q$. We generally identify an element $x\in\bbZ_q$ with its unique representative $\trnq{x}\in (-\tfrac{q}{2}, \tfrac{q}{2}] \cap \bbZ$. For $x\in\bbZ_q$ we define $\abs{x}=|{\trnq{x}}|$.
 When considering an $s\in \{0,1\}^n$ we sometimes also think of $s$ as an element of $\mZ_q^n$, in which case we write it as $\*s$. 
 
 We use the terminology of polynomially bounded and negligible functions. A function $n: \N \to \R_+$ is \emph{polynomially bounded} if there exists a polynomial $p$ such that $n(\lambda)\leq p(\lambda)$ for all $\lambda \in \N$. A function $n: \N \to \R_+$ is \emph{negligible} if for every polynomial $p$, $p(\lambda) n(\lambda)\to_{\lambda\to\infty} 0$. We write $\negl(\lambda)$ to denote an arbitrary negligible function of $\lambda$. 
@@ -301,16 +301,16 @@ The total variation distance between $f_1$ and $f_2$ is
 \begin{equation}\label{eq:stattobhatt}
 \|f_1-f_2\|_{TV} \,=\, \frac{1}{2} \sum_{x\in X}|f_1(x) - f_2(x)| \,\leq\, \sqrt{2H^2(f_1,f_2)}\;.
 \end{equation}
-The following lemma relates the Hellinger distance and the trace distance of superpositions. 
+The following immediate lemma relates the Hellinger distance and the trace distance of superpositions. 
 \begin{lemma}
-Let $X$ be a finite set and $f_1,f_2\in\mathcal{D}_x$. Let 
+Let $X$ be a finite set and $f_1,f_2\in\mathcal{D}_X$. Let 
 $$ \ket{\psi_1}=\sum_{x\in X}\sqrt{f_1(x)}\ket{x}\qquad\text{and}\qquad  \ket{\psi_2}=\sum_{x\in X}\sqrt{f_2(x)}\ket{x}\;.$$
  Then 
  $$\|\ket{\psi_1}-\ket{\psi_2}\|_{tr}\,=\, \sqrt{ 1 - (1-H^2(f_1,f_2))^2}\;.$$
 \end{lemma}
-We require the following definition:
+
 \begin{definition}\label{def:compinddist}
-Two families of distributions $\{D_{0,\lambda}\}_{\lambda\in\mN}$ and $\{D_{1,\lambda}\}_{\lambda\in\mN}$ are computationally indistinguishable if for all quantum polynomial-time attackers $\mathcal{A}$ there exists a negligible function $\mu(\cdot)$ such that for all $\lambda\in\mN$
+We say that two families of distributions $\{D_{0,\lambda}\}_{\lambda\in\mN}$ and $\{D_{1,\lambda}\}_{\lambda\in\mN}$ on the same finite set $\{X_\lambda\}$ are \emph{computationally indistinguishable} if for all quantum polynomial-time procedures $\mathcal{A}:X_\lambda\to\{0,1\}$ there exists a negligible function $\mu(\cdot)$ such that for all $\lambda\in\mN$,
 \begin{equation}
 \Big|\Pr_{x\leftarrow D_{0,\lambda}}[\mathcal{A}(x) = 0] - \Pr_{x\leftarrow D_{1,\lambda}}[\mathcal{A}(x) = 0]\Big| \,\leq\, \mu(\lambda)\;.
 \end{equation}
@@ -380,9 +380,9 @@ $$ \Hmin^\delta(X|E)_\rho \,\geq\, -\frac{1}{\eps} \log \Big( \sum_x \langle \si
 \label{sec:protocol}
 %==============================%
 
-We introduced two protocols. The first we call the \emph{(general) randomness expansion protocol}, or Protocol~1. It is introduced in Section~\ref{sec:re-protocol}, and summarized in Figure~\ref{fig:protocol}. The protocol describes the interaction between a \emph{verifier} and \emph{prover}. Ultimately, we aim to obtain the guarantee that any computationally bounded prover that is accepted with non-negligible probability by the verifier in the protocol must generate randomness. 
+We introduce two protocols. The first we call the \emph{(general) randomness expansion protocol}, or Protocol~1. This is our main randomness expansion protocol. It is introduced in Section~\ref{sec:re-protocol}, and summarized in Figure~\ref{fig:protocol}. The protocol describes the interaction between a \emph{verifier} and \emph{prover}. Ultimately, we aim to obtain the guarantee that any computationally bounded prover that is accepted with non-negligible probability by the verifier in the protocol must generate transcripts that contain information-theoretic randomness. 
 
-The second protocol is called the \emph{simplified protocol}, or Protocol~2. It is introduced in Section~\ref{sec:si-protocol}, and summarized in Figure~\ref{fig:protocol2}. This protocol abstracts some of the main features Protocol~1, and will be used as a tool in the analysis (it is not meant to be actually executed).  
+The second protocol is called the \emph{simplified protocol}, or Protocol~2. It is introduced in Section~\ref{sec:si-protocol}, and summarized in Figure~\ref{fig:protocol2}. This protocol abstracts some of the main features Protocol~1, and will be used as a tool in the analysis (it is not meant to be executed literally).  
 
 
 \subsection{The randomness expansion protocol}
@@ -390,18 +390,18 @@ The second protocol is called the \emph{simplified protocol}, or Protocol~2. It 
 
 Our randomness expansion protocol, Protocol~1, is described in Figure~\ref{fig:protocol}. The protocol is parametrized by a choice of security parameter $\lambda$. All other parameters are assumed to be specified as a function of $\lambda$: the number of rounds $N$, the error tolerance parameter $\gamma \geq 0$, and the testing parameter $q\in (0,1]$. In addition, the protocol depends on a TCF family $\mathcal{F}$ (see Definition~\ref{def:trapdoorclawfree}) that is known to both the verifier and the prover.
 
-At the start of the protocol, the verifier executes $(k,t_k)\leftarrow \Gen_\mF(1^\lambda)$ to obtain the public key $k$ and trapdoor $t_k$ for a pair of functions $\{f_{k,b}:\mX\to \mD_\mY\}$ from the TCF family, and sends the key $k$ to the prover, keeping the associated trapdoor private. 
+At the start of the protocol, the verifier executes $(k,t_k)\leftarrow \Gen_\mF(1^\lambda)$ to obtain the public key $k$ and trapdoor $t_k$ for a pair of functions $\{f_{k,b}:\mX\to \mD_\mY\}_{b\in\{0,1\}}$ from the TCF family. The verifier sends the key $k$ to the prover and keeps the associated trapdoor private. 
 
-In each of the $N$ rounds of the protocol, the prover is first required to provide a value $y\in\mY$. For $b\in\{0,1\}$, the verifier then uses the trapdoor to compute $\hat{x}_b\leftarrow \Inv_\mF(t_k,b,y)$. (If the inversion procedure fails, the verifier requests another sample from the prover.) For convenience, introduce a set 
+In each of the $N$ rounds of the protocol, the prover is first required to provide a value $y\in\mY$. For each $b\in\{0,1\}$, the verifier then uses the trapdoor to compute $\hat{x}_b\leftarrow \Inv_\mF(t_k,b,y)$. (If the inversion procedure fails, the verifier requests another sample from the prover.) For convenience, introduce a set 
 \begin{equation}\label{eq:def-gy}
  \hat{\dset}_y \,=\, \dset_{k,0,x_0} \cap \dset_{k,1,x_1}\;.
 \end{equation}
-The verifier then chooses a round type $G\in\{0,1\}$ according to a biased distribution: either a \emph{test round}, $G=0$, chosen with probability $\Pr(G=0)=\frac{q}{2}$, or a \emph{generation round}, $G=1$, chosen with the remaining probability $\Pr(G=1)=1-\frac{q}{2}$. The former type of round is less frequent, as the parameter $q$ will eventually be set to a very small value, that goes to $0$ with the number of rounds of the protocol. Note the prover is not told the round type. 
+The verifier then chooses a round type $G\in\{0,1\}$ according to a biased distribution: either a \emph{test round}, $G=0$, chosen with probability $\Pr(G=0)=\frac{q}{2}$, or a \emph{generation round}, $G=1$, chosen with the remaining probability $\Pr(G=1)=1-\frac{q}{2}$. The former type of round is less frequent, as the parameter $q$ will eventually be set to a very small value, that goes to $0$ with the number of rounds of the protocol. The prover is not told the round type. 
 
-Depending on the round type, the verifier chooses a challenge $C\in\{0,1\}$ that she sends to the prover. In the case of a test round the challenge is chosen uniformly at random; in the case of a generation round the challenge is always $C=1$. In case $C=0$ the prover is asked to return a pair $(m,d)\in \{0,1\}\times\{0,1\}^w$. The answer is called valid if $m=d\cdot(\inj(x_0)\oplus \inj(x_1))$ and $d\in\hat{\dset}_{y}$, where $x_0$ and $x_1$ are such that $f_{k,b}(x_b)=y$ for $b\in \{0,1\}$. Note that the verifier is able to compute $x_0$ and $x_1$ from $y$ using the trapdoor $t_k$. If $d\in\hat{\dset}_y$, the verifier sets a decision bit $W=1$ if the answer is valid, and $W=0$ if not. If $d\notin \hat{\dset}_y$, the verifier sets the decision bit $W\in\{0,1\}$ uniformly at random.\footnote{This choice if made for technical reasons that have to do with the definition of the adaptive hardcore bit property; see Section~\ref{sec:soundness} and the proof of Proposition~\ref{sec:soundness} for details.}
-In case $C=1$, the prover should return  a pair $(b,x)\in \{0,1\}\times\mX$. The answer is called valid if $f_{k,b}(x)=y$. The set of valid answers on challenge $C=c\in\{0,1\}$ is denoted $V_{y,c}$. The verifier sets a decision bit $W=1$ in case the answer is valid, and $W=0$ otherwise. 
+Depending on the round type, the verifier chooses a challenge $C\in\{0,1\}$ that she sends to the prover. In the case of a test round the challenge is chosen uniformly at random; in the case of a generation round the challenge is always $C=1$. In case $C=0$ the prover is asked to return a pair $(m,d)\in \{0,1\}\times\{0,1\}^w$. The pair is called valid if $m=d\cdot(\inj(\hat{x}_0)\oplus \inj(\hat{x}_1))$ and $d\in\hat{\dset}_{y}$. If $d\in\hat{\dset}_y$, the verifier sets a decision bit $W=1$ if the answer is valid, and $W=0$ if not. If $d\notin \hat{\dset}_y$, the verifier sets the decision bit $W\in\{0,1\}$ uniformly at random.\footnote{This choice if made for technical reasons that have to do with the definition of the adaptive hardcore bit property; see Section~\ref{sec:soundness} and the proof of Proposition~\ref{sec:soundness} for details.}
+In case $C=1$, the prover should return  a pair $(b,x)\in \{0,1\}\times\mX$. The pair is called valid if $f_{k,b}(x)=y$. The verifier sets a decision bit $W=1$ in case the pair is valid, and $W=0$ otherwise. The set of valid pairs on challenge $C=c\in\{0,1\}$ is denoted $V_{y,c}$. 
 
-At the end of the protocol, the verifier computes the decision bit has been set to $1$. If this fraction is smaller than $(1-\gamma)$, the verifier aborts. Otherwise, the verifier returns the concatenation of the prover's answer bits $b$ in generation rounds.
+At the end of the protocol, the verifier computes the fraction of rounds in which the decision bit has been set to $1$. If this fraction is smaller than $(1-\gamma)$, the verifier aborts. Otherwise, the verifier returns the concatenation of the bits $b$ obtained from the prover in generation rounds.
 
 \begin{figure}[htbp]
 \rule[1ex]{16.5cm}{0.5pt}\\
@@ -449,7 +449,7 @@ Let $\lambda$ be a security parameter. Let $N$ be a polynomially bounded functio
 \subsection{The simplified protocol}
 \label{sec:si-protocol}
 
-For purposes of analysis only we introduce a simplified form of Protocol~1, which is specified in Figure~\ref{fig:protocol2}. We call it the \emph{simplified protocol}, or Protocol~2. The protocol is very similar to the randomness expansion protocol described in Figure~\ref{fig:protocol}, except that the prover's answers and the verifier's checks are simplified. For the case of a challenge $C=0$, in Protocol~1 the prover returns an equation $(d,m)$. In the simplified protocol the prover returns a single bit $u\in\{0,1\}$ that is meant to directly indicate the verifier's decision (i.e. the bit $W$). For the case of a challenge $C=1$, in Protocol~1 the prover returns a pair $(b,x)$. In the simplified protocol the prover returns a value $v\in\{0,1,2\}$ that is such that $v=b$ in case $(b,x)$ is valid, i.e. $(b,x)\in V_{y,1}$, and $v=2$ otherwise. 
+For purposes of analysis only we introduce a simplified variant of Protocol~1, which is specified in Figure~\ref{fig:protocol2}. We call it the \emph{simplified protocol}, or Protocol~2. The protocol is very similar to the randomness expansion protocol described in Figure~\ref{fig:protocol}, except that the prover's answers and the verifier's checks are simplified. For the case of a challenge $C=0$, in Protocol~1 the prover returns an equation $(d,m)$. In the simplified protocol the prover returns a single bit $u\in\{0,1\}$ that is meant to directly indicate the verifier's decision (i.e. the bit $W$). For the case of a challenge $C=1$, in Protocol~1 the prover returns a pair $(b,x)$. In the simplified protocol the prover returns a value $v\in\{0,1,2\}$ that is such that $v=b$ in case $(b,x)$ is valid, i.e. $(b,x)\in V_{y,1}$, and $v=2$ otherwise. 
 
 Note that this ``honest'' behavior for the prover is not necessarily efficient. Moreover, it is easy for a ``malicious'' prover to succeed in Protocol 2, e.g. by always returning $u=1$ (valid equation) and $v\in\{0,1\}$ (valid pre-image). Our analysis will not consider arbitrary provers in Protocol~2, but instead provers whose measurements satisfy certain incompatibility constraints that arise from the analysis of Protocol~1. For such provers, it will be impossible to succeed in the simplified protocol without generating randomness. Further details are given in Section~\ref{sec:soundness}.
 
@@ -457,20 +457,20 @@ Note that this ``honest'' behavior for the prover is not necessarily efficient. 
 \subsection{Completeness}
 \label{sec:completeness}
 
-We describe the intended behavior for the prover in the protocol. Fix a TCS family $\mathcal{F}$, and a key $k\in\mathcal{K}_\mathcal{F}$. In each round, the ``honest'' prover performs the following actions:
+We describe the intended behavior for the prover in protocol 1. Fix a TCF family $\mathcal{F}$, and a key $k\in\mathcal{K}_\mathcal{F}$. In each round, the ``honest'' prover performs the following actions.
 \begin{enumerate}
 \item Upon receiving $k$ from the verifier, the prover executes the efficient procedure  SAMP$_{\mathcal{F}}$ in superposition to obtain the state
 \[ \ket{\psi^{(1)}}\,=\,    \frac{1}{\sqrt{|\sX|}}\sum_{x\in \sX,y\in \sY,b\in\{0,1\}}\sqrt{(f'_{k,b}(x))(y)}\ket{b,x}\ket{y}\;.\]
 \item The prover measures the last register to obtain an $y\in\mY$. Using item 2. from the definition of a TCF, the prover's re-normalized post-measurement state is
 \[\ket{\psi^{(2)}} \,=\, \frac{1}{\sqrt{2}}\big(\ket{0,x_0}+\ket{1,x_1}\big)\ket{y}\;.\]
 \begin{enumerate}
-\item In case $C_i=0$, the prover evaluates the function $\inj$ on the second register, containing $x_b$, and then applies a Hadamard transform to all $w+1$ qubits in the first two registers. This yields the state 
+\item In case $C_i=0$, the prover evaluates the function $\inj$ on the second register, containing $x_b$, and then applies a Hadamard transform to all $w+1$ qubits in the first two registers. Tracing out the register that contains $y$, this yields the state 
 \begin{align*}
 \ket{\psi^{(3)}} &= 2^{-\frac{w+2}{2}}  \sum_{d,b,m} (-1)^{d\cdot \inj(x_b)\oplus mb} \ket{m}\ket{d}\\
 &= (-1)^{\inj(x_0)} 2^{-\frac{w}{2}}  \sum_{d} \ket{d\cdot (\inj(x_0)\oplus \inj(x_1))}\ket{d}\;.
 \end{align*}
 The prover measures both registers to obtain $(m,d)$ that it sends back to the verifier. 
-\item In case $C_i=1$, the prover measures the first two registers. He obtains $(b,x_b)$ and returns them to the verifier.
+\item In case $C_i=1$, the prover measures the first two registers of $\ket{\psi^{(2)}}$ in the computational basis, and returns the outcome $(b,x_b)$ to the verifier.
 \end{enumerate}
 \end{enumerate}
 
@@ -480,7 +480,7 @@ For any $\lambda$ and $k\leftarrow\GEN_{\mathcal{F}}(1^\lambda)$, the strategy f
 \end{lemma}
 
 \begin{proof}
-Both efficiency and correctness of the prover follow from the definition of a TCF (Definition~\ref{def:trapdoorclawfree}). The prover fails only if he obtains an outcome $d\notin \hat{\dset}_y$, which by item 4.(a) in the definition happens with negligible probability
+Both efficiency and correctness of the prover follow from the definition of a TCF (Definition~\ref{def:trapdoorclawfree}). The prover fails only if he obtains an outcome $d\notin \hat{\dset}_y$, which by item 4(a) in the definition happens with negligible probability.
 \end{proof}
 
 
@@ -489,7 +489,7 @@ Both efficiency and correctness of the prover follow from the definition of a TC
 \label{sec:device}
 %==============================%
 
-We model an arbitrary prover in the randomness expansion protocol (Protocol 1 in Figure~\ref{fig:protocol}) as a \emph{device} that implements the actions of the prover: the device first returns an $y\in\mY$; then, depending on the challenge $C\in\{0,1\}$, it either returns an equation $(m,d)$ (case $C=0$), or a candidate pre-image $(b,x)$ (case $C=1$). For simplicity we assume that the device makes the same set of measurements in each round of the protocol. This is without loss of generality, as we allow the state of the device to change from one round to the next, and in particular it may play the role of a quantum memory used as a control register by the measurements. 
+We model an arbitrary prover in the randomness expansion protocol (Protocol 1 in Figure~\ref{fig:protocol}) as a \emph{device} that implements the actions of the prover: the device first returns an $y\in\mY$; then, depending on the challenge $C\in\{0,1\}$, it either returns an equation $(m,d)$ (case $C=0$), or a candidate pre-image $(b,x)$ (case $C=1$). For simplicity we assume that the device makes the same set of measurements in each round of the protocol. This is without loss of generality, as we allow the state of the device to change from one round to the next; in particular it may play the role of a quantum memory used as a control register by the measurements. 
 
 In Section~\ref{sec:devices} we introduce our notation for modeling provers in Protocol~1 as general devices. In Section~\ref{sec:binary} we consider a simplified model of device, that is appropriate for modeling a prover in the simplified protocol, Protocol~2. Finally in Section~\ref{sec:sim-dev} we give a reduction showing how to construct a specific simplified device from any general device, such that the simplified device generates similar transcripts in Protocol~2 as the original device does in Protocol~1. 
 
@@ -575,8 +575,8 @@ Let $C\in\{0,1\}$ be a random variable distributed as the verifier's choice of c
 \end{align*}
 where for $v\in\{0,1\}$, $x_v$ is defined by $x_v\leftarrow \Inv_\mF(t_k,v,y)$. Define 
 \begin{align*}
-\sigma_y(D') &= \Pr(C=0) \proj{0}_\reg{C} \otimes\big( \sum_{u\in \{0,1\}} \proj{u}_\reg{O}\otimes (M'_y)^{u} \phi_y (M'_y)^{u}\Big)\\
-&+\Pr(C=1)\proj{1}_\reg{C} \otimes \Big(\sum_{v\in\{0,1,2\}} \proj{v}_\reg{O} \otimes  (\Pi'_y)^{v} \phi_y (\Pi'_y)^{v} \Big)\;.
+\sigma_y(D') &= \Pr(C=0) \proj{0}_\reg{C} \otimes\big( \sum_{u\in \{0,1\}} \proj{u}_\reg{O}\otimes (M'_y)^{u} \phi'_y (M'_y)^{u}\Big)\\
+&+\Pr(C=1)\proj{1}_\reg{C} \otimes \Big(\sum_{v\in\{0,1,2\}} \proj{v}_\reg{O} \otimes  (\Pi'_y)^{v} \phi'_y (\Pi'_y)^{v} \Big)\;.
 \end{align*}
 Then $\sigma(D)$ and $\sigma(D')$ represent the state of the registers that contain the verifier's challenge $C$, the verifier's output $O$, and the device's post-measurement state, after completion of a single round of the protocol. (In particular, the term $\frac{1}{2}\Id_{\reg{O}}$ that appears for the case $C=0$ corresponds to the verifier's coin flip when $d\notin \hat{\dset}_y$.)
 
@@ -592,7 +592,7 @@ Then we say that \emph{$D'$ simulates $D$ (on input $\phi$) up to error $\delta$
 %==============================%
 
 
-In this section we analyze a single round of the randomness expansion protocol described in Figure~\ref{fig:protocol}. Our goal is to argue that a prover that is accepted with non-negligible probability in the protocol can either be used to break the security properties of the TCF family $\mathcal{F}$ used in the protocol (Definition~\ref{def:trapdoorclawfree}), or must generate true randomness. The first step, carried out in this section, is to analyze a single round of the protocol and argue that the measurements made by a computationally efficient, successful prover must have a strong form of incompatibility. Ultimately this condition rests on the ``adaptive harcore bit'' property of the TCF family, item 4. in Definition~\ref{def:trapdoorclawfree}. 
+In this section we analyze a single round of the randomness expansion protocol, Protocol~1 in Figure~\ref{fig:protocol}. Our goal is to argue that a prover that is accepted with non-negligible probability in the protocol can either be used to break the adaptive hardcore bit property of the TCF family $\mathcal{F}$ used in the protocol (item 4. in Definition~\ref{def:trapdoorclawfree}), or must generate true randomness. The first step, carried out in this section, is to analyze a single round of the protocol and argue that the measurements made by a computationally efficient, successful prover must have a strong form of incompatibility.
 
 Throughout this section, we fix a TCF family $\mathcal{F}$ and a key $k\in \mK_\mF$ sampled according to $\Gen(1^\lambda)$, for an integer $\lambda$ that plays the role of security parameter. 
 
@@ -603,7 +603,7 @@ Recall that for any $y\in\mY$, $V_{y,0}$ denotes the set of valid answers for th
 Let $D = (\phi,\Pi,M)$ be an efficient device. Define a sub-normalized density 
 \begin{align}
 \rho_{\reg{YBXE}} &= \sum_{y\in\mY} \proj{y}_\reg{Y}\otimes \sum_{b\in\{0,1\}} \proj{b,x_b}_\reg{BX} \otimes \Pi_y^{(b,x_b)} \,\phi_y \,\Pi_y^{(b,x_b)}\notag\\
-&=  \sum_{b\in\{0,1\}} \proj{b,x_b} \otimes \rho^{(b)}_\reg{YE}\;.\label{eq:def-sigmay}
+&=  \sum_{b\in\{0,1\}} \proj{b,x_b}_\reg{BX} \otimes \rho^{(b)}_\reg{YE}\;.\label{eq:def-sigmay}
 \end{align}
 Then $\rho$ can be efficiently prepared (with success probability $\Tr(\rho)$). Let
 \begin{align}
@@ -616,16 +616,17 @@ Then the states $\sigma_0$ and $\sigma_1$ are computationally indistinguishable.
 \begin{proof}
 Suppose for contradiction that there exists an efficiently implementable observable $O$ such that 
 \begin{equation}\label{eq:bias-o}
-\Tr(O(\sigma_0^{(c)}-\sigma_1^{(c)})) \,\geq\, \kappa\;,
+\Tr(O(\sigma_0-\sigma_1)) \,\geq\, \kappa\;,
 \end{equation}
- for some non-negligible function $\kappa(\lambda)$.\footnote{Recall all quantities are implicitly functions of the security parameter $\lambda$.} For $u\in\{0,1\}$ consider the following procedure. The procedure first prepares the state $\rho$. This can be done efficiently by first preparing $\phi_{\reg{YE}}$, then measuring an $y\in \mY$, then applying the measurement $\{\Pi^{(b,x)}\}$ to $\phi_y$, and rejecting if the outcome is invalid, i.e. does not satisfy $f_{k,b}(x)=y$. 
+ for some non-negligible function $\kappa(\lambda)$. For $u\in\{0,1\}$ consider the following procedure. The procedure first prepares the state $\rho$ in~\eqref{eq:def-sigmay}. This can be done efficiently by first preparing $\phi_{\reg{YE}}$, then measuring an $y\in \mY$, then applying the measurement $\{\Pi_y^{(b,x)}\}$ to $\phi_y$, and rejecting if the outcome is invalid, i.e. does not satisfy $f_{k,b}(x)=y$. 
 
-The procedure then applies the measurement $\{M_y^{(m,d)}\}$ to $\rho$, obtaining an outcome $(d,m)$. At this point, if $d\in \hat{\dset}_{y}$ then the procedure has either prepared $\sigma_0$ or $\sigma_1$. Finally, the procedure  measures $O$ to obtain a bit $u$, and returns $(b,x_b,d,u\oplus m)$. This defines an efficient procedure. Moreover, using~\eqref{eq:bias-o} it follows  that the procedure violates the hardcore bit property~\eqref{eq:adaptive-hardcore} (which only considers those outcome tuples from the adversary that are such that $d\in\hat{\dset}_{y}$. 
+The procedure then applies the measurement $\{M_y^{(m,d)}\}$ to $\rho$, obtaining an outcome $(d,m)$. At this point, if $d\in \hat{\dset}_{y}$ then the procedure has either prepared $\sigma_0$ or $\sigma_1$. Finally, the procedure  measures $O$ to obtain a bit $u$, and returns $(b,x,d,u\oplus m)$. This defines an efficient procedure. Moreover, using~\eqref{eq:bias-o} it follows  that the procedure violates the hardcore bit property~\eqref{eq:adaptive-hardcore} (that only considers those outcome tuples from the adversary that are such that $d\in\hat{\dset}_{y}$). 
 \end{proof}
 
+Recall the definitions of a simplified device (Definition~\ref{def:binary-device}), of the overlap of a simplified device (Definition~\ref{def:overlap}), and of simulation of a device by a simplified device (Definition~\ref{def:device-dist}). 
 
 \begin{proposition}\label{prop:change-d}
-Let $D=(\phi,\Pi,M)$ be an efficient device. Then there is a (not necessarily efficient) simplified device $D'=(\phi,\Pi',M')$ such that $D'$ simulates $D$ up to negligible error, and $D'$ satisfies $\Delta(D') \leq \omega$, where $\omega = \frac{3}{4}$.
+Let $D=(\phi,\Pi,M)$ be an efficient device. Then there is a (not necessarily efficient) simplified device $D'=(\phi,\Pi',M')$ such that $D'$ simulates $D$ up to negligible error, and $D'$ has overlap $\Delta(D') \leq \omega$, where $\omega = \frac{3}{4}$.
 \end{proposition}
 
 \begin{proof}
@@ -647,12 +648,12 @@ Then there exists a projection $Q_y$ such that
 \begin{proof}
 Fix $y\in \mY$. For simplicity, in the following we suppress the dependence on $y$. %For $c\in\{0,1\}$, let 
 %$$M = \sum_{(m,d) \in V_{y,0}} M_y^{(m,d)}\;,\quad\text{and}\quad \hat{M}^{(c)} = \sum_{(m,d) \in \hat{V}_{y,0}^{(c)}} M_y^{(m,d)}\;.$$
-Let $M=M_y$ as defined with the claim. By considering an ancilla space we may apply Naimark's theorem and consider $\{M,\Id-M\}$ %and $\{\hat{M}^{(c)},\Id-\hat{M}^{(c)}\}$, for $c\in\{0,1\}$, are 
+Let $M=M_y$ as defined in the claim. By considering an ancilla space we may apply Naimark's theorem and consider $\{M,\Id-M\}$ %and $\{\hat{M}^{(c)},\Id-\hat{M}^{(c)}\}$, for $c\in\{0,1\}$, are 
 as a projective measurement. %, such that moreover 
 %\begin{equation}\label{eq:mlow}
 % \forall c\in\{0,1\}\;,\qquad M\,\leq\, \hat{M}^{(c)}\;.
 %\end{equation}
- Let $\rho$ be as defined in~\eqref{eq:def-sigmay}. Recall that $\Pi = \Pi^{0}+\Pi^1$. Since $\Pi \rho \Pi = \rho$, for $b\in\{0,1\}$ we may extend the projection $\Pi^b = \Pi^{(b,x_b)}$ to $\tilde{\Pi}^b$ such that $\tilde{\Pi}^0 + \tilde{\Pi}^1 = \Id$ in an arbitrary (but still efficiently implementable) way without affecting the action of the measurement on $\rho$. %For ease of notation, fix $c\in\{0,1\}$ and write $\hat{M}$ for $\hat{M}^{(c)}$, and define, again suppressing the dependence on $c$, 
+ Let $\rho$ be as defined in~\eqref{eq:def-sigmay}. Recall that $\Pi = \Pi^{0}+\Pi^1$. Since $\Pi \rho \Pi = \rho$, for $b\in\{0,1\}$ we may extend the projection $\Pi^b = \Pi^{(b,x_b)}$ to a projection $\tilde{\Pi}^b$ such that $\tilde{\Pi}^0 + \tilde{\Pi}^1 = \Id$ in an arbitrary (but still efficiently implementable) way without affecting the action of the measurement on $\rho$. %For ease of notation, fix $c\in\{0,1\}$ and write $\hat{M}$ for $\hat{M}^{(c)}$, and define, again suppressing the dependence on $c$, 
 Define
 \begin{align}
 \hat{\sigma}_0 &=\sum_{b\in\{0,1\}} \proj{b,x_b}_{\reg{BX}} \otimes  (\Id_\reg{Y}\otimes M) \rho^{(b)}_{\reg{YE}} (\Id_\reg{Y}\otimes M)\notag\\
@@ -664,7 +665,7 @@ M = \oplus_j \begin{pmatrix} c_j^2 & c_js_j \\ c_js_j & s_j^2 \end{pmatrix},\qqu
 \end{equation}
 where $c_j= \cos \theta_j$, $s_j=\sin \theta_j$, for some angles $\theta_j$, and $a_j \geq 0$ such that $\sum_j a_j = \Tr(\rho^{(0)})$. In addition there may be $1$-dimensional blocks in the Jordan decomposition, but these play no role in the following so we ignore them for simplicity. 
 
-Using the representation in~\eqref{eq:n-form} we can evaluate the probability of obtaining outcome $0$ when performing the measurement $\{\tilde{\Pi}^0,\tilde{\Pi}^1\}$ on the state $\hat{\sigma}_{0}^{(0)}$ and obtain $ \sum_j a_j c_j^4$, whereas on the state $\hat{\sigma}_1^{(0)}$ it is $ \sum_j a_j c_j^2s_j^2$. Similarly, the probability of obtaining outcome $1$ on the state $\hat{\sigma}_0^{(0)}$ is $ \sum_j a_j c_j^2 s_j^2$, whereas on the state $\hat{\sigma}_1^{(0)}$ it is $ \sum_j a_j s_j^4$. As already mentioned, it follows from Lemma~\ref{lem:break} that the sub-normalized states $\hat{\sigma}_{0}$ and $\hat{\sigma}_{1}$ are computationally indistinguishable. Since $\{\tilde{\Pi}^0,\tilde{\Pi}^1\}$ can be performed efficiently, it follows that the probability of obtaining outcome $0$, minus the probability of obtaining outcome $1$, evaluated on either state must be negligibly close. Equivalently, it must be the case that
+Using the representation in~\eqref{eq:n-form} we can evaluate the probability of obtaining outcome $0$ when performing the measurement $\{\tilde{\Pi}^0,\tilde{\Pi}^1\}$ on the state $\hat{\sigma}_{0}^{(0)}$, and obtain $ \sum_j a_j c_j^4$, whereas on the state $\hat{\sigma}_1^{(0)}$ it is $ \sum_j a_j c_j^2s_j^2$. Similarly, the probability of obtaining outcome $1$ on the state $\hat{\sigma}_0^{(0)}$ is $ \sum_j a_j c_j^2 s_j^2$, whereas on the state $\hat{\sigma}_1^{(0)}$ it is $ \sum_j a_j s_j^4$. As already mentioned, it follows from Lemma~\ref{lem:break} that the sub-normalized states $\hat{\sigma}_{0}$ and $\hat{\sigma}_{1}$ are computationally indistinguishable. Since $\{\tilde{\Pi}^0,\tilde{\Pi}^1\}$ can be performed efficiently, it follows that the probability of obtaining outcome $0$, minus the probability of obtaining outcome $1$, evaluated on either state must be negligibly close. Equivalently, it must be the case that
 \begin{align}
  \sum_j a_j\big(c_j^4 - c_j^2 s_j^2 \big) - \sum_j a_j\big( c_j^2 s_j^2 - s_j^4 \big)
 &= \sum_j a_j\big(c_j^2 - s_j^2 \big)^2\notag\\
@@ -695,7 +696,7 @@ The second part of the proof of the proposition consists in defining the device 
 \item On challenge $C=0$, the device performs the measurement $\{M_y^{(d,m)}\}$. If $d\notin \hat{\dset}_y$ the device returns a random bit. Otherwise, if $(d,m)\in V_{y,0}$ it returns a $0$, and $1$ if not. %If $r=1$, the device returns a uniformly random bit. 
 \item On challenge $C=1$, device performs the measurement $\{(\Id-Q_y)\Pi_y^{(b,x)}(\Id-Q_y),Q_y\}$. If an outcome $(b,x)$ such that $f_{k,b}(x)=y$ is obtained, the device returns $v=b$. Otherwise, if $f_{k,b}(x)\neq y$ or if the outcome associated with the POVM element $Q_y$ is obtained, the device returns $v=2$. 
 \end{itemize}
-To complete the proof of the lemma we need to verify that $D'$ simulates $D$ up to negligible error, and that $\Delta(D') \leq \frac{3}{4}$. The first point follows since when performing the measurement associated with challenge $C=1$, by~\eqref{eq:q-negl2} the outcome associated with $Q_y$ occurs with negligible probability. 
+To complete the proof of the lemma we need to verify that $D'$ simulates $D$ up to negligible error, and that $\Delta(D') \leq \frac{3}{4}$. The first point follows since when performing the measurement associated with challenge $C=1$, by~\eqref{eq:q-negl2} the outcome associated with the last POVM element $Q_y$ occurs with negligible probability. 
 The second point follows from~\eqref{eq:q-norm-2} and the definition of $Q_y$.
 \end{proof}
 
@@ -709,7 +710,7 @@ The second point follows from~\eqref{eq:q-norm-2} and the definition of $Q_y$.
 \label{sec:multi-round}
 %==============================%
 
-In this section we show that any simplified device $D$ (see Definition~\ref{def:binary-device}) with overlap $\Delta(D)$ (Definition~\ref{def:overlap}) bounded away from $1$ generates randomness in a way that accumulates across each successive round of the simplified protocol, Protocol~2 (Figure~\ref{fig:protocol2}). This is shown in Section~\ref{sec:simplified}. Our final result will be obtained by applying this conclusion to the simplified device that simulates the prover in the regular randomness expansion protocol, as obtained in Section~\ref{sec:soundness}. This is done in Section~\ref{sec:randomness}.
+In this section we show that any simplified device $D$ (see Definition~\ref{def:binary-device}) with overlap $\Delta(D)$ (Definition~\ref{def:overlap}) bounded away from $1$ generates randomness in a way that accumulates across  successive rounds of the simplified protocol, Protocol~2 (Figure~\ref{fig:protocol2}). This is shown in Section~\ref{sec:simplified}. Our final result will be obtained by applying this conclusion to the simplified device that simulates the prover in the regular randomness expansion protocol, as obtained in Section~\ref{sec:soundness}. This is done in Section~\ref{sec:randomness}.
 
 \subsection{Randomness accumulation in the simplified protocol}
 \label{sec:simplified}
@@ -749,7 +750,7 @@ and conclude by applying~\cite[Proposition 5.3]{miller2016robust}.
 
 
 
-Using Lemma~\ref{lem:ms-uncertainty} we proceed to quantify the accumulation of randomness across multiple rounds of the simplified protocol, when it is executed with a simplified device that has overlap bounded away from $1$. For a fixed device $D$, an execution of protocol~2 involves a choice of round types $g\in\{0,1\}^N$ and of challenges $c\in\{0,1\}^N$ by the verifier, and a sequence of outputs $o\in\{0,1,2\}^N$ computed by the verifier as a function of the answers provided by the device. We call the tuple $(c,o)$ the transcript of the protocol; it contains all publicly exchanged information. We let $\Acc$ denote the set of tuples $(g,c,o)$ that are accepted by the verifier in the last step of the protocol, i.e. such that $\sum_{i: g_i=0} w_i \geq (1-\gamma)qN$, where recall that the verifier's decision $w_i$ is a deterministic function of $c_i$ and $o_i$. The joint state of the transcript and the device at the end of the $N$ rounds (but before the verifier's decision to abort) of the protocol can be written as
+Using Lemma~\ref{lem:ms-uncertainty} we proceed to quantify the accumulation of randomness across multiple rounds of the simplified protocol, when it is executed with a simplified device that has overlap bounded away from $1$. For a fixed device $D$, an execution of protocol~2 involves a choice of round types $g\in\{0,1\}^N$ and of challenges $c\in\{0,1\}^N$ by the verifier, and a sequence of outputs $o\in\{0,1,2\}^N$ computed by the verifier as a function of the answers provided by the device. We call the tuple $(c,o)$ the transcript of the protocol; it contains all publicly exchanged information. We let $\Acc$ denote the set of tuples $(g,c,o)$ that are accepted by the verifier in the last step of the protocol, i.e. such that $\sum_{i: g_i=0} w_i \geq (1-\gamma)qN$, where recall that the verifier's decision bit $w_i$ is a deterministic function of $c_i$ and $o_i$. The joint state of the transcript and the device at the end of the $N$ rounds (but before the verifier's decision to abort) of the protocol can be written as
 \begin{equation}\label{eq:pm-2}
  \phi^{(N)}_{\reg{COE}} \,=\, \sum_{g,c,o}\, q(g,c) \, \proj{c}_\reg{C} \otimes \proj{o}_\reg{O} \otimes \phi_\reg{E}^{co}\;,
 \end{equation}
@@ -772,7 +773,7 @@ Let $t = \frac{\langle \phi_K \rangle_{1+\eps} }{\langle \phi \rangle_{1+\eps}}$
 &\hskip6cm \leq 1 - \eps\Big( \lambda_\omega(t) -st +O\Big(q+\frac{\eps}{q}\Big)\Big)\;,\label{eq:lambda-1}
 \end{align}
 where we used $2^{\frac{\eps s}{q}} = 1+\ln(2)\eps s/q + O(\eps^2/q^2)$ and the approximate linearity~\eqref{eq:approx-lin}. 
-A convenient choice of $s$ is to take the derivative $s=\lambda_\omega'(r)$ for $r\in[0,1]$. With this choice, using that $\lambda$ is convex it follows that $\min_{t\in[0,1]} \lambda_\omega(t)-st = \lambda_\omega(r)-\lambda_\omega'(r)r$.
+A convenient choice of $s$ is to take the derivative $s=\lambda_\omega'(r)$ for $r\in[0,1]$. With this choice, using that $\lambda_\omega$ is convex it follows that $\min_{t\in[0,1]} \lambda_\omega(t)-st = \lambda_\omega(r)-\lambda_\omega'(r)r$.
 By chaining the inequality~\eqref{eq:lambda-1} $N$ times, and using that $\Acc$ contains those sequences $(g,c,o)$ such that the number of occurrences of $(c,o)\in\{(1,1),(1,2),(0,1)\}$ is at least $(1-\gamma)qN$, we obtain
 $$ - \frac{1}{\eps N} \log \Big( \frac{ \sum_{(g,c,o) \in \Acc} \,q(g,c) \,\langle \phi^{co} \rangle_{1+\eps}}{\langle \phi \rangle_{1+\eps} }\Big) \,\geq\, (\lambda_\omega(r)-\lambda_\omega'(r)r) + (1-\gamma)\lambda_\omega'(r) -O\Big(q+\frac{\eps}{q}\Big)\;,$$
 with  the term $(1-\gamma)\lambda_\omega'(r)$ coming from the acceptance criterion. Choosing $r=(1-\gamma)$ completes the proof. 
@@ -787,7 +788,7 @@ The main step is given in the following proposition.
 \begin{proposition}\label{prop:randomness}
 Let $D=(\phi,\Pi,M)$ be an efficient device.
 Let $\ket{\phi}_{\reg{ER}}$ denote an arbitrary purification of $\phi_\reg{E}$, and $\ol{\rho}_{\reg{OCR}}$ the joint state of the verifier's choice of challenges, the outputs computed by the verifier, and $\reg{R}$, conditioned on the verifier not aborting at the end of an execution of Protocol~1. 
- Then there is a $\eta\in\negl(\lambda)$ such that for any $\delta \geq 0$,  
+ Then there is an $\eta\in\negl(\lambda)$ such that for any $\delta \geq 0$,  
 \begin{equation}\label{eq:ent-bound-1}
 \frac{1}{N}\Hmin^{N\eta+\delta}(O|CR)_{\ol{\rho}} \,\geq\, \lambda_\omega(1-\gamma) - O\Big(q+\sqrt{\frac{1+\log(2/\delta)}{N}}\Big)\;.
 \end{equation}
@@ -809,7 +810,7 @@ Introduce a sub-normalized density
 $$\rho_\reg{R}^{co}\,=\, \phi^{\frac{1}{2}}P_1\cdots P_N^2 \cdots P_1\phi^{\frac{1}{2}}\;,$$
 that corresponds to the post-measurement state of register $\reg{R}$ (recall we assumed a purification $\ket{\phi}_{\reg{ER}}$ of $\phi$) at the end of protocol $2$, for a given transcript $(c,o)$ for the interaction. We are in a position to apply Theorem~\ref{thm:ms}, with 
 $$\rho_{\reg{COR}}^o = \sum_{(g,c):\,(g,c,o)\in \Acc} \,q(g,c)\, \proj{c}_\reg{C} \otimes \proj{o}_\reg{O}\otimes \rho_\reg{R}^{co}\;,$$
-and $\sigma_\reg{E} = \sum_{(g,c)} q(g,c)\proj{c} \otimes \phi$. Applying the theorem and using~\eqref{eq:d-rand-1} and $\langle\tilde{\phi}\rangle_{1+\eps} = 1$ by definition, we get that for any $\delta >0$,
+and $\sigma_\reg{CR} = \sum_{(g,c)} q(g,c)\proj{c} \otimes \phi$. Applying the theorem and using~\eqref{eq:d-rand-1} and $\langle\tilde{\phi}\rangle_{1+\eps} = 1$ by definition, we get that for any $\delta >0$,
 $$\frac{1}{N} \Hmin^\delta(O|CR)_{\ol{\rho}} \,\geq \,  \lambda_\omega(1-\gamma) - O\Big(q+\frac{\eps}{q}\Big) - \frac{1+2\log(1/\delta)}{\eps N}\;.$$
 Choosing $\eps = \min(1/2,\sqrt{\frac{q(1+2\log(1/\delta))}{N}})$ to balance terms gives the result. 
 \end{proof}
@@ -819,11 +820,11 @@ Combining Proposition~\ref{prop:randomness} with Proposition~\ref{prop:change-d}
 
 \begin{theorem}\label{thm:expansion}
 Let $\mathcal{F}$ be a TCF family and $\lambda$ a security parameter. Set $\gamma = \frac{1}{10}$. Let $N$ be a polynomially bounded function of $\lambda$ such that $N = \Omega(\lambda^2)$. Set $q = \lambda/N$. Then there is a negligible (as a function of $\lambda$) $\delta$ such that for any efficient prover, and side information $R$ correlated with the prover's initial state,
-$$\Hmin^{\delta'}(O|CR)_{\ol{\rho}} \geq  (\kappa-o(1)) N\;,$$
+$$\Hmin^{\delta}(O|CR)_{\ol{\rho}} \geq  (\kappa-o(1)) N\;,$$
 where $\ol{\rho}$ is the final state of the output, challenge, and adversary registers, restricted to transcripts that are accepted by the verifier in the protocol,\footnote{The state $\ol{\rho}$ is sub-normalized.} $\kappa$ is a positive constant,\footnote{The constant $\kappa$ depends on the choice of $\gamma$. It is defined as $\kappa =\lambda_\omega(1-\gamma)$, where $\lambda_\omega$ is defined in~\eqref{eq:def-lambda} and $\omega$ is defined in Proposition~\ref{prop:change-d}.}and $o(1)$ is a function that goes to $0$ as $\lambda\to\infty$. 
 \end{theorem}
 
-Assume that an execution of $\Gen(1^\lambda)$ requires $O(\lambda^r)$ bits of randomness, for some constant $r$. Then an execution of the protocol using the parameters in Theorem~\ref{thm:expansion} requires only $\poly(\lambda,\log N)$ bits of randomness for the verifier to generate the key $k$ and select the challenges. Taking $N$ to be slightly sub-exponential in $\lambda$, e.g. $N=2^{\sqrt{\lambda}}$, yields sub-exponential randomness expansion. 
+Assume that an execution of $\Gen(1^\lambda)$ requires $O(\lambda^r)$ bits of randomness, for some constant $r$. (For example, for the case of our construction of a TCF family based on LWE, we have $r=2$.) instantiation we have  Then an execution of the protocol using the parameters in Theorem~\ref{thm:expansion} requires only $\poly(\lambda,\log N)$ bits of randomness for the verifier to generate the key $k$ and select the challenges. Taking $N$ to be slightly sub-exponential in $\lambda$, e.g. $N=2^{\sqrt{\lambda}}$, yields sub-exponential randomness expansion. 
 
 \begin{proof}[Proof of Theorem~\ref{thm:expansion}]
 Let $D$ be a device that is accepted with non-negligible probability in the protocol, where the parameters are a stated in the theorem. Applying Proposition~\ref{prop:randomness} to $D$ and choosing $\delta$ to be a negligible function of $N$ such that $\delta^{-1}$ is sub-exponential gives the result. 
@@ -839,7 +840,7 @@ Let $D$ be a device that is accepted with non-negligible probability in the prot
 \input{lweprelim.tex}
 
 %================================%
-\section{LWE based Trapdoor Claw Free Family}
+\section{A Trapdoor Claw-Free family based on LWE}
 \label{sec:lwetcf}
 %================================%
 

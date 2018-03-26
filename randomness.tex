@@ -129,7 +129,7 @@
 \begin{document}
 
 \title{Information-theoretic randomness from computational assumptions}
-\author{Zvika Brakerski \and Urmila Mahadev \and Umesh Vazirani \and Thomas Vidick\thanks{California Institute of Technology, USA. Email: \texttt{vidick@cms.caltech.edu}}}
+\author{Zvika Brakerski \and Paul Christiano \and Urmila Mahadev\thanks{UC Berkeley, USA. Email: \texttt{mahadev@berkeley.edu}} \and Umesh Vazirani \and Thomas Vidick\thanks{California Institute of Technology, USA. Email: \texttt{vidick@cms.caltech.edu}}}
 \date{}
 \maketitle
 
@@ -403,7 +403,7 @@ In each of the $N$ rounds of the protocol, the prover is first required to provi
 \end{equation}
 The verifier then chooses a round type $G\in\{0,1\}$ according to a biased distribution: either a \emph{test round}, $G=0$, chosen with probability $\Pr(G=0)=\frac{q}{2}$, or a \emph{generation round}, $G=1$, chosen with the remaining probability $\Pr(G=1)=1-\frac{q}{2}$. The former type of round is less frequent, as the parameter $q$ will eventually be set to a very small value, that goes to $0$ with the number of rounds of the protocol. The prover is not told the round type. 
 
-Depending on the round type, the verifier chooses a challenge $C\in\{0,1\}$ that she sends to the prover. In the case of a test round the challenge is chosen uniformly at random; in the case of a generation round the challenge is always $C=1$. In case $C=0$ the prover is asked to return a pair $(m,d)\in \{0,1\}\times\{0,1\}^w$. The pair is called valid if $m=d\cdot(\inj(\hat{x}_0)\oplus \inj(\hat{x}_1))$ and $d\in\hat{\dset}_{y}$. If $d\in\hat{\dset}_y$, the verifier sets a decision bit $W=1$ if the answer is valid, and $W=0$ if not. If $d\notin \hat{\dset}_y$, the verifier sets the decision bit $W\in\{0,1\}$ uniformly at random.\footnote{This choice if made for technical reasons that have to do with the definition of the adaptive hardcore bit property; see Section~\ref{sec:soundness} and the proof of Proposition~\ref{sec:soundness} for details.}
+Depending on the round type, the verifier chooses a challenge $C\in\{0,1\}$ that she sends to the prover. In the case of a test round the challenge is chosen uniformly at random; in the case of a generation round the challenge is always $C=1$. In case $C=0$ the prover is asked to return a pair $(m,d)\in \{0,1\}\times\{0,1\}^w$. The pair is called valid if $m=d\cdot(\inj(\hat{x}_0)\oplus \inj(\hat{x}_1))$ and $d\in\hat{\dset}_{y}$. If $d\in\hat{\dset}_y$, the verifier sets a decision bit $W=1$ if the answer is valid, and $W=0$ if not. If $d\notin \hat{\dset}_y$, the verifier sets the decision bit $W\in\{0,1\}$ uniformly at random.\footnote{This choice if made for technical reasons that have to do with the definition of the adaptive hardcore bit property; see Section~\ref{sec:soundness} and the proof of Proposition~\ref{prop:change-d} for details.}
 In case $C=1$, the prover should return  a pair $(b,x)\in \{0,1\}\times\mX$. The pair is called valid if $f_{k,b}(x)=y$. The verifier sets a decision bit $W=1$ in case the pair is valid, and $W=0$ otherwise. The set of valid pairs on challenge $C=c\in\{0,1\}$ is denoted $V_{y,c}$. 
 
 At the end of the protocol, the verifier computes the fraction of rounds in which the decision bit has been set to $1$. If this fraction is smaller than $(1-\gamma)$, the verifier aborts. Otherwise, the verifier returns the concatenation of the bits $b$ obtained from the prover in generation rounds.
@@ -639,7 +639,7 @@ The proof has two steps. In the first step, for each $y\in\mY$ we argue the exis
 
 \begin{claim}
 For any $y\in \mY$, let 
-$$\hat{M}_y = \sum_{(m,d):\, d\notin \hat{D}_y} M_{y}^{(m,d)}\;,\qquad M_y = \sum_{(m,d) \in V_{y,0}} M_y^{(m,d)} + \frac{1}{2} \hat{M}_y\;,$$
+$$\hat{M}_y = \sum_{(m,d):\, d\notin \dset_y} M_{y}^{(m,d)}\;,\qquad M_y = \sum_{(m,d) \in V_{y,0}} M_y^{(m,d)} + \frac{1}{2} \hat{M}_y\;,$$
 and for $b \in\{0,1\}$, $\Pi_y^b = \Pi_y^{(b,x_b)}$.
 Then there exists a projection $Q_y$ such that 
 \begin{equation}\label{eq:q-negl2}

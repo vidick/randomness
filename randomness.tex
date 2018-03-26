@@ -420,7 +420,7 @@ Let $\lambda$ be a security parameter. Let $N$ be a polynomially bounded functio
 \item The verifier selects a round type $G_i \in \{0,1\}$ according to a Bernoulli  distribution with parameter $\frac{q}{2}$: $\Pr(G_i=0)=\frac{q}{2}$ and $\Pr(G_i=1)=1-\frac{q}{2}$. In case $G_i=0$ (\emph{test round}), she chooses a challenge $C_i\in \{0,1\}$ uniformly at random. In case $G_i=1$ (\emph{generation round}), she sets $C_i=1$. The verifier keeps $G_i$ private, and sends $C_i$ to the prover. 
 \begin{enumerate}
 \item In case $C_i=0$ the prover returns $(m,d)\in\{0,1\}\times \{0,1\}^w$. If $d\notin \hat{\dset}_y$, the set defined in~\eqref{eq:def-gy} the verifier sets $W$ to a uniformly random bit. Otherwise, the verifier sets $W=1$ if $d\cdot (\inj(\hat{x}_0)\oplus \inj(\hat{x}_1)) = m$ and $W=0$ if not.
-\item In case $C_i=1$ the prover returns $(b,x)\in\{0,1\}\times \mX$. The verifier sets $W=1$ if $x = \hat{x}_b$, and $W=0$ otherwise. 
+\item In case $C_i=1$ the prover returns $(b,x)\in\{0,1\}\times \mX$. The verifier sets $W$ as the value returned by CHK$_{\mathcal{F}}(k,b,x,y)$. 
 \end{enumerate}
 \item In case $G_i=1$, the verifier sets $O_i = b$. In case $G_i=0$, she sets $W_i = W$. 
 \end{enumerate}
@@ -598,7 +598,7 @@ Then we say that \emph{$D'$ simulates $D$ (on input $\phi$) up to error $\delta$
 %==============================%
 
 
-In this section we analyze a single round of the randomness expansion protocol, Protocol~1 in Figure~\ref{fig:protocol}. Our goal is to argue that a prover that is accepted with non-negligible probability in the protocol can either be used to break the adaptive hardcore bit property of the TCF family $\mathcal{F}$ used in the protocol (item 4. in Definition~\ref{def:trapdoorclawfree}), or must generate true randomness. The first step, carried out in this section, is to analyze a single round of the protocol and argue that the measurements made by a computationally efficient, successful prover must have a strong form of incompatibility.
+In this section we analyze a single round of the randomness expansion protocol, Protocol~1 in Figure~\ref{fig:protocol}. Our goal is to argue that a prover that is accepted with non-negligible probability in the protocol can either be used to break the adaptive hardcore bit property of the TCF family $\mathcal{F}$ used in the protocol (item 4. in Definition~\ref{def:trapdoorclawfree}), or must generate true randomness. The first step, carried out in this section, is to analyze a single round of the protocol and argue that the measurements made by a computationally efficient prover must have a strong form of incompatibility --- lest they could be used to break the adaptive hardcore bit property.
 
 Throughout this section, we fix a TCF family $\mathcal{F}$ and a key $k\in \mK_\mF$ sampled according to $\Gen(1^\lambda)$, for an integer $\lambda$ that plays the role of security parameter. 
 
@@ -624,7 +624,7 @@ Suppose for contradiction that there exists an efficiently implementable observa
 \begin{equation}\label{eq:bias-o}
 \Tr(O(\sigma_0-\sigma_1)) \,\geq\, \kappa\;,
 \end{equation}
- for some non-negligible function $\kappa(\lambda)$. For $u\in\{0,1\}$ consider the following procedure. The procedure first prepares the state $\rho$ in~\eqref{eq:def-sigmay}. This can be done efficiently by first preparing $\phi_{\reg{YE}}$, then measuring an $y\in \mY$, then applying the measurement $\{\Pi_y^{(b,x)}\}$ to $\phi_y$, and rejecting if the outcome is invalid, i.e. does not satisfy $f_{k,b}(x)=y$. 
+ for some non-negligible function $\kappa(\lambda)$. For $u\in\{0,1\}$ consider the following procedure. The procedure first prepares the state $\rho$ in~\eqref{eq:def-sigmay}. This can be done efficiently by first preparing $\phi_{\reg{YE}}$, then measuring an $y\in \mY$, then applying the measurement $\{\Pi_y^{(b,x)}\}$ to $\phi_y$, and rejecting if the outcome is invalid, i.e. CHK$_{\mathcal{F}}(k,b,x,y)=0$. 
 
 The procedure then applies the measurement $\{M_y^{(m,d)}\}$ to $\rho$, obtaining an outcome $(d,m)$. At this point, if $d\in \hat{\dset}_{y}$ then the procedure has either prepared $\sigma_0$ or $\sigma_1$. Finally, the procedure  measures $O$ to obtain a bit $u$, and returns $(b,x,d,u\oplus m)$. This defines an efficient procedure. Moreover, using~\eqref{eq:bias-o} it follows  that the procedure violates the hardcore bit property~\eqref{eq:adaptive-hardcore} (that only considers those outcome tuples from the adversary that are such that $d\in\hat{\dset}_{y}$). 
 \end{proof}

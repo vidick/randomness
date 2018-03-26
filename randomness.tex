@@ -165,7 +165,7 @@ algorithm is random --- $y$ is a random element in the image of $f$, and $d$ is 
 
 Of course the classical verifier cannot access the inner workings of the quantum device, and from her viewpoint the device is a black box that outputs $y$ and $d$. However, since she knows the secret trapdoor, she can verify that $d$ satisfies the equation  $d\cdot(x + x') = 0$. 
 One might now conjecture that for a generic TCF if the output of any efficient quantum device passes this test with non-negligible advantage over $\frac{1}{2}$ then the pair $y,d$ must have high min-entropy. Such a strong statement would immediately yield a randomness certification protocol. 
-While we do not know how to prove this, we are still able to design and analyze a simple protocol, that can be based on any TCF family and succeeds in certifiable randomness expansion from a single untrusted quantum (polynomial-time) device. Security of the protocol rests on an appropriate cryptographic assumption on the TCF. We give a construction for which the assumption rests only on the sub-exponential Learning With Errors (LWE) assumption. 
+While we do not know how to prove this, we are still able to design and analyze a simple protocol, that can be based on any TCF family and succeeds in certifiable randomness expansion from a single untrusted quantum (polynomial-time) device. Security of the protocol rests on an appropriate cryptographic assumption on the TCF. We give a construction for which the assumption rests only on the superpolynomial Learning With Errors (LWE) assumption. 
 
 \subsection{Outline of randomness generation protocol}
 

@@ -12,7 +12,7 @@ In our instantiation based on LWE, it is not possible to prepare~\eqref{eq:perfe
 
 We slightly modify the adaptive hardcore bit requirement as well. Since the set $\sX$ may not be a subset of binary strings, we first assume the existence of an injective, efficiently invertible map $\inj:\sX\to\{0,1\}^w$. Next, we only require the adaptive hardcore bit property to hold for a subset of all nonzero strings, instead of the  set $\{0,1\}^w\setminus \{0^w\}$. Finally, membership in the appropriate set should be efficiently checkable, given access to the trapdoor. 
 
-A formal definition follows. 
+A formal definition follows.\footnote{ 
 
 \begin{definition}[TCF family]\label{def:trapdoorclawfree}
 Let $\lambda$ be a security parameter. Let $\sX$ and $\sY$ be finite sets.

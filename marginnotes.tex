@@ -9,6 +9,9 @@
 \newcommand{\notesendofpaper}{{\theendnotes}}
 \newcommand{\pnote}[1]{{\endnote{#1}}}
 
+\newcommand{\authnote}[3]{\textcolor{#3}{\small {\textbf{[ {#1}:} #2 \textbf{]
+}}}}
+
 
 \else
 
@@ -17,10 +20,16 @@
 \newcommand{\notesendofpaper}{}
 \newcommand{\pnote}[1]{}
 
+\newcommand{\authnote}[3]{}
+
 \fi
 
-\newcommand{\tnote}[1]{\textcolor{magenta}{\small {\textbf{(Thomas:} #1\textbf{)
-      }}}}
-\newcommand{\anote}[1]{\textcolor{red}{\small {\textbf{(Anand:} #1\textbf{) }}}}
-\newcommand{\ftnote}[1]{\footnote{\textcolor{magenta}{\small {\textbf{(Thomas:} #1\textbf{) }}}}}
-\newcommand{\tdnote}[1]{\textcolor{blue}{\small {\textbf{(TODO:} #1\textbf{) }}}}
+%\newcommand{\tnote}[1]{\textcolor{magenta}{\small {\textbf{(Thomas:} #1\textbf{)
+%      }}}}
+%\newcommand{\anote}[1]{\textcolor{red}{\small {\textbf{(Anand:} #1\textbf{) }}}}
+%\newcommand{\ftnote}[1]{\footnote{\textcolor{magenta}{\small {\textbf{(Thomas:} #1\textbf{) }}}}}
+%\newcommand{\tdnote}[1]{\textcolor{blue}{\small {\textbf{(TODO:} #1\textbf{) }}}}
+
+\newcommand{\tnote}[1]{\authnote{Thomas}{#1}{magenta}}
+\newcommand{\znote}[1]{\authnote{Z}{#1}{red}}
+\newcommand{\unote}[1]{\authnote{Urmila}{#1}{blue}}
